@@ -1,0 +1,55 @@
+module UnionFindBare
+
+use int.Int
+use array.Array
+use option.Option
+
+(* DO NOT CHANGE *)
+type elem = int
+
+type uf = { size : int ;
+            parent : array elem ;
+            rank : array int }
+
+predicate is_root (uf : uf) (x : elem)
+
+(* DO NOT CHANGE THE NAMES OR TYPES OF THESE FUNCTIONS *)
+let uf_new (n : int) : uf
+let find (uf : uf) (x : elem) : elem
+let union (uf : uf) (x : elem) (y : elem) : unit
+
+end (* module UnionFindBare *)
+
+module CongBare
+
+  use int.Int
+  use list.List
+  use array.Array
+  
+  (* DO NOT CHANGE *)
+  type const = int
+
+  (* DO NOT CHANGE *)
+  type eqn =
+  | Defn const const const  (* c = App a b *)
+  | Eqn const const         (* a = b *)
+
+  use UnionFindBare as U
+
+  type cc = { size : int ;
+              uf : U.uf ;
+              mutable eqns : list eqn }
+
+  (* DO NOT CHANGE THE NAMES OR TYPES OF THESE FUNCTIONS *)
+  let cc_new (n : int) : cc
+  let merge (cc : cc) (e : eqn) : unit
+  let check_eq (cc : cc) (a : const) (b : const) : bool
+
+end  (* module CongBare *)
+
+(* optional module *)
+module Test
+
+  use CongBare as C
+
+end

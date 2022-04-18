@@ -1,0 +1,177 @@
+module SatDefs
+
+use int.Int
+use ref.Ref
+use list.List
+use list.Length as List
+use list.Mem
+use list.Quant as Q
+use array.Array
+use array.ArrayEq
+use array.NumOfEq
+use option.Option
+
+(******************************************************************************)
+(* Basic types and predicates, from previous assignment                       *)
+(******************************************************************************)
+
+let function (==) (a b : bool) : bool
+    ensures { result <-> ((not a /\ not b) \/ (a /\ b)) }
+    =
+    match a with
+    | True -> b
+    | False -> not b
+    end
+
+type var = int (* DO NOT CHANGE *)
+
+type lit = { var : var ; sign : bool }                  (* DO NOT CHANGE *)
+
+type clause = list lit                                  (* DO NOT CHANGE *)
+
+predicate vars_in_range (n : int) (c : clause) =
+  forall l:lit. mem l c -> 0 <= l.var < n
+
+type cnf = { clauses : array clause ; nvars : int }     (* DO NOT CHANGE *)
+  invariant { nvars >= 0 }                              (* DO NOT CHANGE *)
+  invariant { forall i:int. 0 <= i < length clauses ->  (* DO NOT CHANGE *)
+              vars_in_range nvars clauses[i] }
+  by { clauses = Array.make 0 Nil; nvars = 0 }
+
+type valuation = array bool                             (* DO NOT CHANGE *)
+
+predicate valid_valuation (rho : valuation) (cnf : cnf) =
+  length rho = cnf.nvars                                (* DO NOT CHANGE *)
+
+predicate clause_sat_with (rho : valuation) (c : clause) =
+  exists l:lit. mem l c && rho[l.var] = l.sign
+
+predicate sat_with (rho : valuation) (cnf : cnf) =      (* DO NOT CHANGE *)
+  forall i:int. 0 <= i < length cnf.clauses ->
+  clause_sat_with rho cnf.clauses[i]
+
+let rec eval_clause (rho : valuation) (c : clause) : bool =
+  variant { c }
+  requires { vars_in_range (length rho) c }
+  ensures  { result = clause_sat_with rho c }
+  match c with
+    | Nil -> false
+    | Cons l ls ->
+      rho[l.var] == l.sign || eval_clause rho ls
+  end
+
+let eval_cnf (rho : array bool) (cnf : cnf) : bool =
+  requires { valid_valuation rho cnf }
+  ensures { result = sat_with rho cnf }
+  let sat = ref true in
+  for i = 0 to length cnf.clauses - 1 do
+    invariant { !sat <-> forall j:int. 0 <= j < i ->
+                clause_sat_with rho cnf.clauses[j] = true }
+    if not (eval_clause rho cnf.clauses[i]) then
+      sat := false
+  done ;
+  !sat
+
+(******************************************************************************)
+(* Partial valuations                                                         *)
+(******************************************************************************)
+
+type pval = array (option bool)                         (* DO NOT CHANGE *)
+
+predicate valid_pval (pval : pval) (cnf : cnf) =
+  length pval = cnf.nvars                               (* DO NOT CHANGE *)
+
+predicate pval_eq (pval pval' : pval) = array_eq pval pval'
+
+predicate assigned (pval : pval) (v : var) = pval[v] <> None
+
+predicate compatible (pval : pval) (rho : valuation) =
+  forall i:int, b:bool. 0 <= i < length pval ->
+  pval[i] = Some b -> rho[i] = b
+
+predicate sat_with_pval (pval : pval) (cnf : cnf) =
+  forall rho:valuation. compatible pval rho -> sat_with rho cnf
+
+predicate complete (pval : pval) =
+  forall v. 0 <= v < length pval -> assigned pval v
+
+(******************************************************************************)
+(* Partial evaluation of CNFs                                                 *)
+(******************************************************************************)
+
+type cnf_status =                                       (* DO NOT CHANGE *)
+  | Sat
+  | Conflict clause
+  | Unit_clause lit
+  | Other
+
+type clause_status =                                    (* DO NOT CHANGE *)
+  | Satisfied
+  | Conflicting
+  | Unit lit
+  | Unresolved
+
+exception Conflict_found clause
+exception Unit_found lit
+
+let rec partial_eval_clause (pval : pval) (c : clause) : clause_status =
+  Unresolved (* Specify and implement this function *)
+
+let partial_eval_cnf (pval : pval) (cnf : cnf) : cnf_status =
+  Other (* Specify and implement this function *)
+
+(******************************************************************************)
+(* Helpful definitions and utility functions                                  *)
+(******************************************************************************)
+
+predicate var_in_clause (v : var) (c : clause) =
+  exists l. mem l c && l.var = v
+
+predicate sign_in_clause (v : var) (c : clause) (b : bool) =
+  (exists l. mem l c && l.var = v && l.sign = b)
+
+predicate equal_clause (c1 : clause) (c2 : clause) =
+  forall l. mem l c1 <-> mem l c2
+
+let rec var_in_clause (v : var) (c : clause) : bool
+  ensures { result <-> exists l. l.var = v && mem l c }
+  variant { c }
+  =
+  Q.mem (fun l1 l2 -> l1.var = l2.var) { var=v ; sign=false } c
+
+let rec lit_in_clause (l : lit) (c : clause) : bool
+  ensures   { result <-> mem l c }
+  ensures   { result <-> (sign_in_clause l.var c l.sign) }
+  variant   { c }
+  =
+  Q.mem (fun l1 l2 -> l1.var = l2.var && l1.sign == l2.sign) l c
+
+let rec check_clause_contained (c1 : clause) (c2 : clause) : bool
+  ensures   { result <-> forall l. mem l c1 -> mem l c2 }
+  variant   { c1 }
+  =
+  match c1 with
+  | Nil -> true
+  | Cons l ls -> (lit_in_clause l c2) && (check_clause_contained ls c2)
+  end
+
+let rec check_equal_clause (c1 : clause) (c2 : clause) : bool
+  ensures   { result <-> equal_clause c1 c2 }
+  variant   { c1 }
+  =
+  let c1_contained = check_clause_contained c1 c2 in
+  let c2_contained = check_clause_contained c2 c1 in
+  c1_contained && c2_contained
+
+let clause_in_cnf (c : clause) (cnf : cnf) : bool
+  ensures   { result <-> exists i. 0 <= i < cnf.clauses.length && equal_clause c cnf.clauses[i] }
+  =
+  let ref r = false in
+  for i = 0 to cnf.clauses.length - 1 do
+    invariant { r <-> exists j. 0 <= j < i && equal_clause c cnf.clauses[j] }
+    if r then ()
+    else r <- check_equal_clause c cnf.clauses[i]
+  done ;
+  r
+
+end (* SatDefs *)

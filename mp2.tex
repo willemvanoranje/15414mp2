@@ -1,0 +1,951 @@
+\documentclass[11pt]{article}
+
+\newcommand{\lecid}{15-414}
+\newcommand{\leccourse}{Bug Catching: Automated Program Verification}
+\newcommand{\lecturer}{}
+\newcommand{\lecurl}{http://www.cs.cmu.edu/~15414/s22}
+
+\newcommand{\hwnum}{2}
+\newcommand{\hwtitle}{Verification with Certificates}
+\newcommand{\hwdue}{Friday, April 22, 2022 (checkpoint) \\
+  Friday, April 29, 2022 (final)}
+\newcommand{\hwpoints}{150 pts}
+
+\usepackage{lecnotes}
+\usepackage{hw}
+\usepackage{stmaryrd}
+\usepackage{enumitem}
+\input{fp-macros}
+\lstset{style=why}
+
+\begin{document}
+
+\maketitle
+
+You should \textbf{pick one of the following two alternative
+  mini-projects}.  You may, but are not required to, do the mini-project
+with a partner.
+
+\begin{quote}
+  WhyML implementations of the data structures below that have been
+  verified in Why3 may exist online.  While you can examine Why3
+  reference materials, tutorials, and examples, \textbf{you may not
+    read or use Why3 implementations of the data structures we ask you
+    to code}.  However, you may study or use implementations in other
+  languages (with appropriate citations), and you can
+  freely use anything in the Why3 standard library.  In addition, the
+  \href{http://toccata.lri.fr/gallery/why3.en.html}{Toccata gallery}
+  of verified Why3 program may provide some insight.
+\end{quote}
+The mini-projects have two due dates:
+\begin{itemize}
+\item Checkpoint on Fri Apr 22 2022, 2022 (50 pts)
+\item Final projects on Fri Apr 29 2022 (100 pts) \newline
+  Up to 20 pts you lost on the checkpoint may be recovered
+  on your final submission if you fix the problems that were noted.
+  You are strongly encouraged to look at our feedback even if you
+  received a full score.
+\end{itemize}
+
+The mini-projects must be submitted electronically on Gradescope.
+Please carefully read the policies on collaboration and credit on the
+course web pages at \url{\lecurl/assignments.html}.
+
+If you are working with a partner, only one of the two of you needs to
+submit to each Gradescope assignment.  Once you have uploaded a
+submission, you should select the option to add group members on the
+bottom of the screen, and add your partner to your submission.  Your
+partner should then make sure that they, too, can see the submission.
+
+\begin{quote}
+  Our main piece of advice is this: {\color{red}\textbf{Elegance is not
+      optional!}}  For writing verified code, this applies to both:
+  the specification and the implementation.
+\end{quote}
+
+\clearpage
+\subsection*{The Code}
+
+In each problem, we provide some suggested module outlines, but your
+submitted modules may be different.  For example, where we say
+`\verb|let|' it may actually be `\verb|let rec|', or `\verb|function|',
+or `\verb|predicate|', etc.  You may also modify the order of the
+functions or provide auxiliary types and functions.  You may also change
+the type definitions or types of functions \textbf{except for externally
+  visible ones we use for testing purposes}.  They are marked in the
+starter code as \verb|DO NOT CHANGE|.
+
+You can find starter code in the \verb|sat-starter/| and \verb|cong-starter/|
+directories.
+
+\subsection*{The Writeup}
+
+The writeup should consist of the following sections:
+\begin{enumerate}
+\item {\bf{Executive Summary.}}  Which problem did you solve?  Did you manage
+  to write and verify all functions?  If not, where did the code or
+  verification fall short?  Which were the key decisions you had to
+  make?  What ended up being the most difficult and the easiest parts?
+  What did you find were the best provers for your problem?  What did
+  you learn from the effort?
+\item {\bf{Code Walk.}}  Explain the relevant or nontrivial parts of the
+  specification or code.  Point out issues or alternatives, taken or
+  abandoned.  Quoting some code is helpful, but avoid ``core dumps.''
+  Basically, put yourself into the shoes of a professor or TA wanting
+  to understand your submission (and, incidentally, grade it).
+\item {\bf{Recommendations.}}  What would you change in the assignment if we
+  were going to reuse it again next year?
+\end{enumerate}
+Depending on how much code is quoted, we expect the writeup to consist of about
+3-4 pages in the lecture notes style.
+
+\subsection*{What To Hand In}
+
+You should hand in the following files on Gradescope:
+\begin{itemize}
+\item Submit the file \texttt{mp2.zip} to MP2 Checkpoint
+  (Code) for the checkpoint and to MP2 Final (Code) for the
+  final handin.  Make sure you submit both the code and completed session folder in the zip.
+  Feel free to adjust our past Makefiles for your purposes, but you are not
+  required to create one.
+\item Submit a PDF containing your final writeup to
+  MP2 Final (Written).  There is no checkpoint for the
+  written portion of the mini-project.  You may use the file
+  \texttt{mp2-final.tex} as a template and submit \texttt{mp2-final.pdf}.
+\end{itemize}
+
+\begin{quote}\bf
+  Make sure your session directories and your PDF solution files are
+  up to date before you create the handin file.
+\end{quote}
+
+\subsection*{Using LaTeX}
+
+We prefer the writeup to be typeset in LaTeX, but as long as you hand in
+a readable PDF with your solutions it is not a requirement.  We package
+the assignment source \texttt{mp2.tex} and a solution template
+\texttt{mp2-final.tex} in the handout to get you started on this.
+
+\clearpage
+\section{Certificate-Producing SAT Solver}
+
+A \emph{SAT solver} uses a decision procedure to establish the satisfiability of a propositional formula. 
+The goal of this project is to implement a SAT solver based on DPLL, takes a formula in conjunctive normal form as an input, and decides whether or not it is satisfiable.
+When the formula is satisfiable, the solver returns a satisfying assignment that it has verified correct.
+When the formula is not satisfiable, the solver returns a certificate that encodes a resolution proof that the original formula is unsatisfiable.
+
+\section*{A Reminder on DPLL and Certificates}
+
+The {DPLL} algorithm enhances a naive backtracking search algorithm
+by implementing an optimization called \emph{unit propagation}: if a clause
+becomes unit during the search process, it can only be satisfied by making its unique
+unassigned literal true and so no branching is necessary. In practice, this rule
+often applies in cascade, which can reduce the search space greatly. An example run
+of the {DPLL} algorithm is shown Figure~\ref{fig:sat-ex}.
+More details on the DPLL algorithm are available in the Lecture 12 notes.
+
+\bigskip
+
+\newcommand{\true}[0]{\texttt{true}}
+\newcommand{\false}[0]{\texttt{false}}
+
+
+\begin{figure}[h!]
+\hrulefill
+\small
+\[F \,=\, 
+  \overbrace{(a \lor \lnot b)}^{C_0} \,\wedge\, 
+  \overbrace{(\lnot a \lor c \lor \lnot d)}^{C_1} \,\wedge\, 
+    \overbrace{(a \lor c \lor \lnot d)}^{C_2} \,\wedge\,
+    \overbrace{(\lnot c \lor \lnot e)}^{C_3}  \,\wedge\,
+    \overbrace{(\lnot c \lor e)}^{C_4}  \,\wedge\,
+    \overbrace{(c \lor d)}^{C_5}
+\]
+
+
+\begin{center}
+\begin{tabular}{ll}
+
+\textbf{Step} & \textbf{Partial valuation} \\
+
+
+Start with an empty partial valuation. & $\{\}$ \\
+
+Decide $a$. & $\{a \mapsto \true \}$ \\
+
+\quad Decide $c$. & $\{a \mapsto \true,\, c \mapsto \true \}$ \\
+
+\quad \quad Propagate $\lnot e$ from unit clause $C_3$. & 
+$\{a \mapsto \true,\, c \mapsto \true,\, e \mapsto \false \}$ \\
+
+\quad \quad Clause $C_4$ is conflicting. Backtrack. & $\{a \mapsto \true \}$ \\
+
+\quad Decide $\lnot c$. & $\{a \mapsto \true,\, c \mapsto \false \}$ \\
+
+\quad \quad Propagate $d$ from $C_5$. & 
+$\{a \mapsto \true,\, c \mapsto \false,\, d \mapsto \true \}$ \\
+
+\quad \quad Clause $C_1$ is conflicting. Backtrack. & $\{ \}$ \\
+
+Decide $\lnot a$. & $\{a \mapsto \false \}$ \\
+
+\quad Propagate $\lnot b$ from unit clause $C_1$. & 
+$\{a \mapsto \false,\, b \mapsto \false \}$ \\
+
+\quad Decide $c$. & 
+$\{a \mapsto \false,\, b \mapsto \false,\, c \mapsto \true \}$ \\
+
+\quad \quad \quad Propagate $\lnot e$ from unit clause $C_3$. & 
+$\{a \mapsto \false,\, b \mapsto \false,\, c \mapsto \true,\, e \mapsto \false \}$ \\
+
+\quad \quad \quad Clause $C_4$ is conflicting. Backtrack. & 
+$\{a \mapsto \false,\, b \mapsto \false \}$ \\
+
+\quad Decide $\lnot c$. & 
+$\{a \mapsto \false,\, b \mapsto \false,\, c \mapsto \false \}$ \\
+
+\quad \quad \quad Propagate $d$ from unit clause $C_5$. & 
+$\{a \mapsto \false,\, b \mapsto \false,\, c \mapsto \false,\, d \mapsto \true \}$ \\
+
+\quad \quad \quad Clause $C_2$ is conflicting. Backtrack. & $\{ \}$ \\
+
+\textbf{Unsat}
+
+\end{tabular}
+\end{center}
+\caption{Unit propagation in action}\label{fig:sat-ex}
+\hrulefill
+\end{figure}
+
+\medskip
+
+In the above example, the procedure returns unsat after first attempting to set $a$ to $\true$, encountering a conflict, then setting $a$ to $\false$, and encountering another conflict.
+
+\noindent
+When DPLL returns that a formula is unsatisfiable, it can also produce a resolution proof that the formula is indeed satisfiable.
+Recall the resolution rule from Lecture 13. Below, $C$ has no copy of $p$ and $D$ has no copy of $\lnot p$.
+\[
+  \infer[\m{resolution}]
+  {C \lor D}
+  {p \lor C & \lnot p \lor D}
+\]
+We say that $C \lor D$ is the \emph{resolvent} obtained by removing the complementary literals $p$ and $\lnot p$ from $p \lor C$ and $\lnot p \lor D$, respectively.
+A resolution proof that ends with the empty clause, equivalent to $\bot$, is called a \emph{refutation}, as it demonstrates the unsatisfiability of the formula.
+
+A representative encoding of a refutation obtained by the DPLL trace above might look as as follows below on the left; the corresponding proof tree is on the right, with the complementary literal listed to the right of each step.
+In the encoding on the left, literals appearing in the formula are referred to by integers, with $a$ corresponding to \verb'0', $b$ to \verb'1', $\lnot c$ to $-2$, and so forth.
+Each line begins with a unique identifier, and contains either an assumption or a resolution step.
+Lines with \verb'assume' list a clause from the formula, e.g., \verb'[-2 4]' for $\lnot c \lor e$.
+Lines with \verb'resolve' list the identifiers for two previous lines, followed by a variable, followed by the resolvent obtained by applying resolution to the clauses on the identified lines, on the complementary literals specified by the variable.
+So \verb'resolve 0 1 4 [-2]' states that $\lnot c$ is the resolvent obtained from steps 0 (\verb'assume [-2 4]') and 1 (\verb'assume [-2 -4]'), on variable $e$ (\verb'4').
+
+\begin{figure}[h!]
+\small
+\begin{minipage}{0.32\textwidth}
+\begin{lstlisting}
+0  assume  [-2 4]
+1  assume  [-2 -4]
+2  resolve 0 1 4 [-2]
+3  assume  [2 3]
+4  assume  [-0 2 -3]
+5  resolve 3 4 3 [-0 2]
+6  resolve 2 5 2 [-0]
+7  assume  [0 2 -3]
+8  resolve 7 3 3 [0 2]
+9  resolve 2 8 2 [0]
+10 resolve 6 9 0 []
+\end{lstlisting}
+\end{minipage}
+\hspace*{1em}
+\resizebox{0.5\textwidth}{!}{%
+\begin{minipage}{0.6\textwidth}
+\[
+\infer[a]
+  {\bot}
+  {
+    \infer[c]
+      {\lnot a}
+      {
+        \infer[e] {\lnot c} {\lnot c \lor e & \lnot c \lor \lnot e}
+        &
+        \infer[d] {\lnot a \lor c} {c \lor d & \lnot a \lor c \lor \lnot d}
+      }
+    &
+    \infer[c]
+    {a}
+    {
+        \infer[e] {\lnot c} {\lnot c \lor e & \lnot c \lor \lnot e}
+        &
+        \infer[d] {a \lor c} {a \lor c \lor \lnot d & c \lor d}
+    }
+  }
+\]
+\end{minipage}
+}
+\end{figure}
+The procedure for obtaining this proof is as follows.
+
+\begin{enumerate}[itemsep=1pt,topsep=1pt,partopsep=10pt,parsep=1pt]
+  \item Whenever a conflict is encountered on clause $C$,
+    \begin{itemize}[itemsep=1pt,topsep=1pt,partopsep=1pt,parsep=1pt]
+    \item If the conflict occurred because literal $l$ propagated from unit clause $C'$, return the resolvent of $C$ and $C'$ on $l$.
+    \item Otherwise, return $C$.
+    \end{itemize}
+  \item Whenever both decisions $l$ and $\lnot l$ result in conflicts, apply resolution to the clauses obtained from Step 1, on complementary literals $l$ and $\lnot l$.
+  \item When applying resolution in Steps 1 and 2, if one clause does not involve the literal $l$, then skip resolution and return that clause instead.
+\end{enumerate}
+
+\clearpage
+
+\subsection{``Baby'' SAT (Checkpoint, 50 points)}
+
+In \href{https://www.cs.cmu.edu/~15414/assignments/asst5.pdf}{Assignment 5}, you specified and implemented some simple operations that can be performed over formulas in CNF.
+\begin{lstlisting}
+  type var = int
+  type lit = { var : var ; sign : bool }
+  type clause = list lit
+  type cnf = { clauses : array clause ; nvars : int }
+  type valuation = array bool
+\end{lstlisting}
+We will pick up where we left off, making use of the same types and functionality that you implemented before.
+Below is a basic SAT solver that builds on this, using exhaustive search to find a satisfying assignment.
+According to its specification, if it does not find a satisfying assignment, then it should return a certificate that amounts to a valid refutation for the original formula.
+\begin{lstlisting}
+let sat (cnf : cnf) : solver_result =
+  ensures { forall t. result = Assignment t -> sat_with t cnf }
+  ensures { forall p. result = Proof p -> valid_refutation p cnf }
+  raises  { InvalidCert }
+  let t = make cnf.nvars false in
+  let rec split i =
+    (* Invariants in solver.mlw *)
+    if i = cnf.nvars then
+      if eval_cnf t cnf then raise Sat
+    else begin
+      t[i] <- false ; split (i + 1) ;
+      t[i] <- true  ; split (i + 1) ;
+    end
+  in try split 0 ; raise InvalidCert with Sat -> Assignment t end
+\end{lstlisting}
+Note that the return type for this solver is \verb'solver_result':
+\begin{lstlisting}
+type solver_result =
+  | Assignment valuation
+  | Proof certificate
+\end{lstlisting}
+
+\subsubsection*{Certificate checking}
+However, in its current form this solver does not produce certificates, and will always raise an exception when it encounters an unsatisfiable formula.
+But in order to produce a resolution certificate, it needs (at least) a definition of the type \verb'certificate', and more importantly a definition for \verb'valid_refutation' and a procedure to ensure that a given certificate meets this definition.
+
+\begin{task}[2 points]
+Define a type \verb'certificate' that will encode resolution proofs of unsatisfiability.
+You may choose whatever representation you like, i.e. proofs can be trees with leaves corresponding to clauses from the formula, or flat sequences with fields that identify antecedents at other positions in the sequence.
+Before proceeding, you should think carefully about which encoding to use, and consider looking ahead to future tasks to inform your choice.
+Note that you may define other types that are referenced by \verb'certificate', e.g., if you want to define a type for each individual step in a resolution proof.
+\end{task}
+
+\begin{task}[8 points]
+Define a predicate \verb'valid_refutation' over a certificate \verb'p' and formula \verb'cnf'. 
+It should the set of \verb'certificate' objects which correspond to correct resolution proofs of unsatisfiability.
+In other words, the predicate should be true if and only if: 
+\begin{itemize}
+\item Each step encoded in a \verb'certificate' is either a correct application of the resolution rule, or an assumption of a clause appearing in the original CNF formula.
+\item The final step of the proof encoded in the certificate is the empty clause.
+\end{itemize}
+As in the previous task, you may write several ``helper'' predicates or functions that are used to define \verb'valid_refutation', and are encouraged to do so to make your specification more readable.
+\end{task}
+
+\begin{task}[20 points]
+Implement the function \verb'check_refutation', which accepts a certificate \verb'p' and CNF formula \verb'cnf', and returns true if and only if the certificate is a valid refutation for the formula.
+If you need to change the signature to make it recursive, that is fine, but you should provide a variant to ensure that this procedure terminates.
+As before, you are encouraged to implement helper functions that accomplish much of the work needed by \verb'check_refutation', to make your code easier to understand.
+
+\begin{lstlisting}
+let check_refutation (p : certificate) (cnf : cnf) : bool
+  requires { true } (* Any necessary preconditions *)
+  ensures { result <-> valid_refutation p }
+\end{lstlisting}
+\end{task}
+
+As you complete this task, we encourage you to make use of the helper functions provided in the starter code.
+There are functions for performing basic tests on clauses and literals that may prove useful when implementing your certificate checker.
+
+\subsubsection*{Generating refutation certificates}
+
+Now that you have defined a way to encode refutation proofs, and implemented a procedure to check that they amount to valid refutations, the only thing left to do is to instrument the solver presented earlier to generate certificates while it conducts its search.
+
+\begin{task}[20 points]
+Instrument the \verb'sat' function to produce certificates, and use your implementation of \verb'check_refutation' to ensure that \verb'sat' satisfies its contract.
+\begin{itemize}
+
+\item Whenever the search splits on both \verb'true' and \verb'false' assignments to a variable \verb'p', and encounters conflicts in both cases, the certificate should reflect a corresponding application of the resolution rule on \verb'p'. 
+
+\item When the search completes after the initial call to \verb'split' on line 10, your implementation should proceed to check the certificate and return it on success.
+
+\item If the check fails, then your procedure may raise an \verb'InvalidCert' exception. Your implementation may also raise \verb'InvalidCert' as it conducts its search, if it encounters a situation where it is not able to continue generating a correct certificate. However, if it is apparent that your implemenation is unable to generate valid resolution certificates on most inputs, then you will not recieve full credit for this task.
+\end{itemize}
+\end{task}
+The only verification that you are required to perform are the two postconditions given in the listing of \verb'sat' above. You do not need to prove that your implementation terminates. You may need to write other contracts and invariants that, for example, ensure that array accesses are in bounds. \textbf{You are not required to verify any part of your implementation apart from what is needed to establish the given postconditions}. 
+
+As you complete this task, keep these verification goals in mind, and take care not to over-specify requirements on types and helper functions that will lead to unnecessary effort when generating certificates.
+If preconditions or invariants that you wrote for earlier tasks are proving difficult to verify at this stage, then consider revisiting your code and making the specifications as weak as possible.
+You do not need to prove that the solver will always generate a correct certificate whenever it is given an unsatisfiable formula; rather, you need to prove that any certificate that it returns is a valid refutation for the original formula.
+Take full advantage of this as you complete these tasks!
+
+\paragraph{What not to change.} To allow us to check your work effectively, do not change the signature of \verb'sat', or any of the type definitions listed at the beginning of this section: \verb'var', \verb'lit', \verb'clause', \verb'cnf', and \verb'valuation'.
+
+\subsection{Upgrade to DPLL: adding unit propagation (Final submission, 80 points)}
+
+The SAT solvers that have been widely used in practice for decades improve on the simple solver from the previous section first in two regards: 
+\begin{itemize}
+\item They do not postpone checking for conflicts or satisfaction until coming up with a complete assignment to all of the variables in the formula.
+\item They apply unit propagation immediately after splitting on a variable, to avoid wasting time on unnecessary case splits.
+\end{itemize}
+While there are of course many other improvements that have made their way into state-of-the-art solvers, these are essential, and incorporating them will be the focus of this part of the assignment.
+Your goal will be to adapt key parts of the solver to incorporate partial assignments and unit propagation, while maintaining the ability to generate certificates as the solver completes its work.
+
+In all of the tasks below, your primary concern will be implementing correct functionality.
+You do not need to provide complete specifications to facilitate a full verification of your code, beyond what is necessary to ultimately ensure that the top-level postconditions on \verb'sat' can be verified.
+You can annotate any function with \verb'diverges' to avoid needing to prove termination.
+\textbf{Remember not to over-specify, and only spend time verifying what is actually required by the top-level contracts on} \verb|sat|\textbf{!}
+
+We encourage you to read through all of these tasks before starting.
+
+\subsubsection*{Essential Primitives}
+
+A variable in a partial valuation can take values \emph{True} or \emph{False} if it is assigned a value, or \emph{None} if is unassigned. A complete valuations relates  a with partial valuation as follows. A partial valuation is said to be \emph{compatible} with a valuation $\rho$ if both agree on every variable which is assigned by $p$. In particular, an empty partial valuation is compatible with any valuation.
+
+\begin{lstlisting}
+type pval = array (option bool)
+
+predicate compatible (pval : pval) (rho : valuation) =
+  forall i:int, b:bool. 0 <= i < length pval ->
+  pval[i] = Some b -> rho[i] = b
+\end{lstlisting}
+
+\begin{task}[15 pts] 
+Implement a function \verb|partial_eval_clause| that takes a partial valuation $p$ along with a clause $C$ as its arguments and returns:
+\begin{itemize}
+\setlength\itemsep{0em}
+\item $[\texttt{Satisfied}]$ if and only if $p$ satisfies $C$
+\item $[\texttt{Conflicting}]$ if and only if $p$ and $C$ are conflicting
+\item $[\texttt{Unit}\ l]$ if $c$ is a unit clause with unassigned literal $l$ (for partial valuation $p$)
+\item $[\texttt{Unresolved}$] in every other case. 
+\end{itemize}
+This corresponds to the following type and function definition:
+\begin{lstlisting}
+type clause_status =
+  | Satisfied
+  | Conflicting
+  | Unit lit
+  | Unresolved
+
+let rec partial_eval_clause (p : pval) (c : clause) : clause_status
+\end{lstlisting}
+\end{task}
+
+\begin{task}[15 pts] 
+Implement a function \verb|partial_eval_cnf| that takes a partial valuation $p$ along with a CNF formula $cnf$ as its arguments and returns:
+\begin{itemize}
+\setlength\itemsep{0em}
+\item $[\texttt{Sat}]$ if and only if $p$ satisfies every clause of $cnf$.
+In this case, $cnf$ is true for every valuation that is compatible
+with $p$ and the search can stop.
+\item $[\texttt{Conflict}]$ if $p$ is conflicting with at least one clause of $cnf$. In this case, $cnf$ is false for every valuation that is compatible with $p$ and backtracking is needed.
+\item $[\texttt{Unit\_clause}\ l]$ only if $cnf$ admits a unit clause whose unassigned literal is $l$. If $cnf$ admits more than one unit clause, which one is featured in the argument of $\texttt{Unit\_clause}$ is unspecified.
+\item $[\texttt{Other}]$ in every other case.
+\end{itemize}
+Your \texttt{partial\_eval\_cnf} function should raise an exception \texttt{Conflict\_found} when a conflict is found. You do not need to find all conflicts and return an exception in the first conflict you find.
+Likewise, it should raise \texttt{Unit\_found} when a unit clause is found, and may return the first unit clause found.
+This corresponds to the following type and function definition:
+\begin{lstlisting}
+exception Conflict_found
+exception Unit_found lit
+
+type cnf_status =
+  | Sat
+  | Conflict
+  | Unit_clause lit
+  | Other
+
+let partial_eval_cnf (p : pval) (cnf : cnf) : cnf_status
+\end{lstlisting}
+\end{task}
+
+\subsubsection*{Managing Solver State}
+
+Recall that in the DPLL algorithm, when a conflict arises during search, one has to backtrack before the last decision point. 
+A naive way to do so would be to create a full copy of the current partial valuation every time a choice is made, but this
+is terribly inefficient. 
+A better alternative is to maintain a list of every variable that has been assigned since the last decision point and to use this list as a reference for backtracking.
+
+\begin{task}[5 pts] 
+Implement a \verb|backtrack| function that unassigns the variables on a given list in a given partial valuation:
+\begin{lstlisting}
+let rec backtrack (diff : list var) (pval : pval)
+\end{lstlisting}
+\end{task}
+
+\begin{task}[20 pts] 
+Implement a function \verb|set_sign| that takes as its arguments an unassigned literal \verb'l', the current partial valuation \verb'pval', and the formula \verb'cnf'. It updates \verb'pval' by setting \verb'l.var' to \verb'l.sign', and recursively performs unit propagation until reaching a conflict, or there are no further unit clauses.
+When it terminates, it provides the following information to the solver:
+\begin{itemize}[itemsep=1pt,topsep=1pt,partopsep=10pt,parsep=1pt]
+  \setlength\itemsep{0em}
+  \setlength\partopsep{0em}
+\item It raises a \verb|Sat_found| exception in case the CNF becomes satisfied.
+\item If it reaches a conflict, then the first component of its return value is \verb'true', and its second component is \verb'Some c', where \verb'c' is either:
+  \begin{itemize}[itemsep=1pt,topsep=1pt,partopsep=10pt,parsep=1pt]
+    \setlength\itemsep{0em}
+    \setlength\partopsep{0em}
+    \item The clause on which it encountered a conflict, if the conflict did not occur after unit propagation.
+    \item If the conflict was encountered in clause $C_1$ after unit-propagating literal $l$ from unit clause $C_2$, then the resolvent of $C_1$ and $C_2$ on literal $l$.
+  \end{itemize}
+\item If it does not reach a conflict, and the CNF is not satisfied after exhausting unit propagation, then the first component is \verb'false', and the second component is \verb'None'.
+\item Its third component is a list of all of the variables that it assigned in \verb'pval' prior to returning, which the solver can use for backtracking.
+\end{itemize}
+
+\begin{lstlisting}
+exception Sat_found
+let rec set_sign 
+  (l : lit) (pval : pval) (cnf : cnf) : (bool, option clause, list var)
+\end{lstlisting}
+\end{task}
+
+\subsubsection*{Updating the Solver}
+
+\begin{task}[25 pts] Update your function \verb|sat| from before to make use of partial valuations, putting all the previous pieces together to either prove the satisfiability of a propositional formula, or provide a resolution certificate in cases of unsatisfiability.  
+The updated function should satisfy the same contract that it did before when it used complete valuations.
+Likewise, you still do not need to prove termination.
+You should change the type of \verb'solver_result' to present partial valuations rather than complete assignments.
+\begin{lstlisting}
+type solver_result =
+  | Assignment pval
+  | Proof certificate
+\end{lstlisting}
+\end{task}
+
+\paragraph{What not to change.} To allow us to check your work effectively, do not change the signature of \verb'sat', or any of the type definitions listed at the beginning of this section or the previous: \verb'var', \verb'lit', \verb'clause', \verb'cnf', \verb'valuation', \verb'clause_status', \verb'cnf_status', and \verb'pval'.
+
+\subsection{Writeup (Final Submission, 20 pts)}
+
+\begin{task}[20 pts]
+Writeup, to be handed in separately as file \verb|mp2-final.pdf|.  
+\end{task}
+
+\clearpage
+\section{Congruence Closure}
+\setcounter{task}{0}
+
+At the core of decision procedures or theorem provers for a variety of
+theories are algorithms to compute the \emph{congruence closure} of
+some equations including uninterpreted function symbols.  Even more
+fundamentally, congruence closure itself relies on computing and
+maintaining \emph{equivalence classes} of terms.  An efficient data
+structure for this purpose is called \emph{union-find}.  You may read,
+for example, the Wikipedia article on
+\href{https://en.wikipedia.org/wiki/Disjoint-set_data_structure}{Disjoint-Set
+  Data Structure}.  Union-find also has other applications, such as in
+Kruskal's algorithm for minimum spanning trees.
+
+For the checkpoint, you will implement union-find and partially
+prove it correct and also produce checkable certificates.
+For the final submission you will use your union-find algorithm
+to implement congruence closure, which will also produce a
+certificate.
+
+\subsection{Bare Union-Find (Checkpoint, 25 pts)}
+
+All \emph{elements} that are to be divided into equivalence classes
+are represented as integers $0 \leq x < \m{size}$.  In a separate data
+structure maintained by a client, these could be mapped, for example,
+to terms.
+
+Throughout the algorithm, each equivalence class maintains a unique
+\emph{representative element} which we visualize as the root of a
+tree.  In addition, each element has a \emph{parent}, with the
+representative of a class functioning as its own parent.  We call such
+representatives \emph{roots}.
+
+To determine if two elements $x$ and $y$ are in the same equivalence
+class we ascend the tree to find the representative of the classes for
+$x$ and $y$, say, $\hat{x} = \m{find}\, x$ and
+$\hat{y} = \m{find}\, y$.  If $\hat{x} = \hat{y}$ then $x$ and $y$ are
+in the same class; otherwise they are not.
+
+Initially, all elements are in their own (singleton) equivalence
+class and we call $\m{union}$ to merge equivalence classes.
+The operation $\m{union}\, x\, y$ should merge the equivalence classes
+for $x$ and $y$.  We do this by calculating the representatives
+$\hat{x} = \m{find}\, x$ and $\hat{y} = \m{find}\, y$.  If these are
+equal we are done.  Otherwise, we set the parent of $\hat{x}$ to be
+$\hat{y}$ or the parent of $\hat{y}$ to be $\hat{x}$.
+
+To decide between these two alternatives we maintain a \emph{rank} for
+each root $z$ that is a bound on the longest chain of parent pointers
+for the tree below $z$.  We set the parent of $\hat{x}$ to $\hat{y}$
+if $\hat{x}$ has strictly smaller rank than $\hat{y}$ and vice versa.
+If the ranks are equal, the choice is arbitrary, and we also have to
+increase the rank of the resulting root by one.
+
+\begin{task}[25 pts]
+\label{task:bare}
+  Implement the bare union-find data structure with the following
+  types:
+\begin{lstlisting}
+type elem = int
+
+type uf = { size : int ;
+            parent : array elem ;
+            rank : array int }
+\end{lstlisting}
+Here, $\m{parent}[x]$ is the parent of element $x$, and $x$ itself for
+the root. $\m{rank}[x]$ is the rank of $x$ (only relevant if $x$ is a
+root).  Implement the following predicates and functions,
+following the informal description and other sources as you see fit.
+
+\begin{lstlisting}
+predicate is_root (uf : uf) (x : elem)
+let uf_new (n : int) : uf
+let find (uf : uf) (x : elem) : elem
+let union (uf : uf) (x : elem) (y : elem) : unit
+\end{lstlisting}
+
+\begin{itemize}
+\item $\m{is\_root}\, \mi{uf}\, x$ is true iff $x$ is a root in $\mi{uf}$.
+\item $\m{uf\_new}\, n = \mi{uf}$ returns a new union-find structure
+  over elements $0 \leq x < n$, with each element a root.
+\item $\m{find}\, \mi{uf}\, x = \hat{x}$ returns the root $\hat{x}$ representing
+  the equivalence class containing $x$.
+\item $\m{union}\, \mi{uf}\, x\, y$ modifies $\mi{uf}$ by merging
+  the classes containing $x$ and $y$.
+\end{itemize}
+
+Your contracts should be strong enough to verify that all array
+accesses are in bounds and that the result of $\m{find}$ is a root.
+\textbf{You do not need to verify termination (use \texttt{diverges} instead)
+or any other correctness properties of your functions.}
+
+Because the contracts essentially only specify \emph{safety} and not
+correctness, it is your responsibility to make sure your code properly
+implements the union-find data structure.  You do \textbf{not need to
+  implement the so-called \emph{path compression}} during the $\m{find}$
+operation (which further improves the already excellent bound of
+$n\,\mathrm{log}(n)$ for $n$ successive union-find operations).  We
+recommend writing test cases, but we do not require them as part of your
+submission.
+\end{task}
+
+\subsection{Producing Certificates (Checkpoint, 25 pts)}
+
+In many practical scenarios where decision procedures or theorem provers
+are used, it is impractical to formally prove their correctness.  That
+is unfortunate, as we want to be able to rely on the results.  To close
+this gap, we can extend the algorithm so it produces a certificate, or
+even verify that it \emph{could} produce a certificate when it gives a
+positive answer.
+
+Applying this to union-find means we would like to instrument the code
+so that it can produce a \emph{certificate showing} that any element is
+equivalent to the representative of the equivalence class it is in.  We
+call a certificate that $x$ and $y$ belong to the same equivalence class a
+\emph{path from $x$ to $y$}.  We have the following constructors for
+paths, derived from the axioms for equivalence relations:
+\begin{itemize}
+\item $\m{refl}\, x$ is a path from $x$ to $x$.
+\item $\m{sym}\, p$ is a path from $y$ to $x$ if $p$ is a path from $x$ to $y$.
+\item $\m{trans}\, p\, y\, q$ is a path from $x$ to $z$ if $p$ is a
+  path from $x$ to $y$ and $q$ is a path from $y$ to $z$.
+\end{itemize}
+Whenever $\m{union}\, x\, y$ is called, the client of the data
+structure must provide a path from $x$ to $y$ which somehow justifies
+the equivalence.  For example, if $x = a + 1$ and $y = 1 + a$, the
+client might provide a path explaining that $x$ and $y$ are equivalent
+due to the commutativity of addition.  The implementation of
+union-find takes these on faith (they are the client's responsibility,
+after all) but can apply $\m{refl}$, $\m{sym}$, and $\m{trans}$ to
+build longer paths from those that are given.
+
+We keep the type of $\m{path}$ abstract so that the implementation of
+union-find cannot ``fake'' any paths.  The properties listed above are
+summarized using the axioms below.
+\begin{lstlisting}
+type path  (* abstract *)
+function refl (x : elem) : path
+function sym (p : path) : path
+function trans (p1 : path) (x : elem) (p2 : path) : path
+
+predicate connects (p : path) (x : elem) (y : elem)
+axiom c_refl : forall x. connects (refl x) x x
+axiom c_sym : forall p x y. connects p x y -> connects (sym p) y x
+axiom c_trans : forall x y z p q.
+  connects p x y -> connects q y z -> connects (trans p y q) x z
+\end{lstlisting}
+
+The union-find data structure now maintains a ghost array $\m{path}$
+of paths, where for every element $x$, $\m{path}[x]$ is a path
+connecting $x$ to $\m{parent}[x]$.  \textbf{This property should be
+  guaranteed by the data structure invariants.}  The information is
+sufficient to produce a path from $x$ to the representative $\hat{x}$
+of its equivalence class.
+
+\begin{task}[25 pts]
+\label{task:path}
+We update the interface as follows:
+\begin{lstlisting}
+type uf = { size : int ;
+            parent : array elem ;
+            rank : array int ;
+            ghost path : array path }
+
+let uf_new (n : int) : uf
+let find (uf : uf) (x : elem) : (elem, ghost path)
+let union (uf : uf) (x : elem) (y : elem) (ghost pxy : path) : unit
+\end{lstlisting}
+with the specifications
+\begin{itemize}
+\item $\m{find}\, \mi{uf}\, x = (\hat{x}, p)$ should ensure that $p$
+  is a path from $x$ to $\hat{x}$.  This path should be constructed
+  while traversing the data structure.  \textbf{Your postcondition should
+  enforce that $p$ is indeed a path from $x$ to $\hat{x}$.}
+\item $\m{union}\, \mi{uf}\, x\, y\, p$ requires that $p$ is a path from
+  $x$ to $y$.  This means the client has to supply the evidence for the
+  equality $x$ and $y$.  Since $\m{union}$ modifies $\mi{uf}$ by merging
+  the classes of $x$ and $y$, it will need to update the $\m{path}$
+  field to maintain the data structure invariants.
+\end{itemize}
+Your code should include sufficient data structure invariants and
+contracts to guarantee these properties for $\m{find}$ and
+$\m{union}$.  \textbf{Your contracts still do not need to express, for
+  example, that $\m{union}$ really represents a union.  It therefore
+  remains your responsibility that the code is correct.}
+\end{task}
+
+\subsection{Implementing Congruence Closure (Final Submission, 40 pts)}
+
+You may want to review the description of \emph{congruence closure} in
+\href{\lecurl/lectures/18-array-proc.pdf}{Lecture 18} or other online
+information you find helpful.  We will implement \emph{incremental
+  congruence closure} in which equations are asserted one by one
+and equality can be checked at any time.  So at the high level
+we would have the following interface:
+\begin{lstlisting}
+  type eqn
+  type cc
+  let cc_new (n : int) : cc
+  let merge (cc : cc) (e : eqn) : unit
+  let check_eq (cc : cc) (e : eqn) : bool
+\end{lstlisting}
+where $\m{cc}$ is the type of the data structure maintaining the
+congruence closure, and $\m{cc\_new}\, n$ creates a new data structure over
+constants $0, \ldots, n-1$ where each element is only equal to itself.
+
+$\m{merge}\, \mi{cc}\, e$ updates $\mi{cc}$ to incorporate the
+equation $e$, and $\m{check\_eq}\, \mi{cc}\, e$ returns $\mi{true}$ if
+the equation $e$ follows from the equations asserted so far and the
+standard inference rules in the theory of equality with uninterpreted
+function symbols (namely: reflexivity, symmetry, transitivity, and
+monotonicity).
+
+\subsubsection{Representation of Terms}
+
+It is convenient to represent all constants as integers
+$0, \ldots, n-1$, as in the implementation of union-find.  For a
+maximally streamlined implementation we represent all terms in
+\emph{Curried} form.
+\begin{lstlisting}
+  type const = int
+  type term = Const const | App term term
+\end{lstlisting}
+Here are some examples, using $a = 1$, $b = 2$, etc.
+\newcommand{\app}[2]{(\m{App}\, #1\, #2)}
+\newcommand{\const}[1]{(\m{Const}\, #1)}
+\[
+  \begin{array}{lll}
+    \mbox{Term} & \mbox{Curried} & \mbox{WhyML} \\ \hline
+    c & c & \m{Const}\, 3\\
+    f(a) & (f\, a) & \app{\const{6}}{\const{1}} \\
+    f(g(a),b) & ((f\, (g\, a))\, b)& \app{\app{\const{6}}{\app{\const{7}}{\const{1}}}}{\const{2}}
+  \end{array}
+\]
+During congruence closure and other operations we need to consider
+equality between subterms of the input.  In order to support this in a
+simple and efficient way we translate terms to so-called \emph{flat
+  terms} using new constants that act as names for the subterms.  For
+example, the term $f(g(a),b)$ (or $((f\, (g\, a))\, b)$ in Curried form)
+might have the name $c_3$ with the definitions
+\[
+  \begin{array}{ll}
+    c_1 = g\, a \\
+    c_2 = f\, c_1 \\
+    c_3 = c_2\, b
+  \end{array}
+\]
+This representation means we only have to consider two kinds
+of equations in our algorithm, $c = \app{a}{b}$ for constants
+$a$ and $b$ and $a = b$.
+\begin{lstlisting}
+  type const = int
+  type eqn =
+  | Defn const const const  (* c = App a b *)
+  | Eqn const const         (* a = b *)
+\end{lstlisting}
+
+\subsubsection{The Incremental Congruence Closure Algorithm}
+
+In order to accommodate the definitions above, we slightly
+modify the interface.
+\begin{lstlisting}
+module CongBare
+
+  use ...
+
+  type const = int
+  type eqn =
+  | Defn const const const  (* c = app a b *)
+  | Eqn const const         (* c = a *)
+
+  use UnionFindBare as U
+
+  type cc = { size : int ;
+              uf : U.uf ;
+              mutable eqns : list eqn }
+
+  let cc_new (n : int) : cc
+  let merge (cc : cc) (e : eqn) : unit
+  let check_eq (cc : cc) (a : const) (b : const) : bool
+
+end
+\end{lstlisting}
+Here, $\m{UnionFindBare}$ is your bare implementation from the
+checkpoint.  You may make minor modifications and extensions to its
+interface for the purposes of the final submission.
+
+The field $\m{cc.uf}$ should be a union-find data structure over the
+constants $0 \leq c < \m{cc.size}$ and $\m{cc.eqns}$ should be a list of
+the equations you need for the computation of your algorithm.
+
+At a high level, $\m{merge}\, \mi{cc}\, e$ should assert the equation
+$e$.  This proceeds in two phases.  In the first phase, we suitably
+update $\m{cc.uf}$ and $\m{cc.eqns}$ to join equivalence classes.  In
+the second phase, we repeatedly \emph{propagate} the equality to create a
+representation of the \emph{congruence closure}.
+
+The function $\m{check\_eq}\, \mi{cc}\, a\, b$ should just consult
+the union-find data structure to see if $a$ and $b$ are in the same
+equivalence class.
+
+Your implementation does not need to be particularly efficient, but it
+should be polynomial.  Furthermore, we constrain it to use union-find
+to maintain equivalence classes so that further standard improvements
+would be straightforward to make.  Such further improvements are
+generally related to \emph{indexing} to avoid searching through lists.
+
+Your contracts should be sufficient for \emph{safety} of all array
+accesses, but do not otherwise have to express correctness.
+Furthermore, you do not need to ensure termination.
+
+As a consequence, you will need to test your implementation, and we
+will do so as well while grading.  In order to facilitate our testing
+harness, you must adhere to the significant parts of the interface
+(namely, types $\m{const}$ and $\m{eqn}$, and the types of the
+functions $\m{cc\_new}$, $\m{merge}$, and $\m{check\_eq}$).  You may,
+however, modify or add fields to the $\m{cc}$ structure, since testing
+will not rely on these internals.
+
+\begin{task}[40 pts]
+  Implement and verify the safety the $\m{CongBare}$ module as
+  specified above.
+\end{task}
+
+We recommend you test your implementation but we do not formally require
+it.  You should hand in file \verb|cong-bare.mlw| with modules
+$\m{UnionFindBare}$ and $\m{CongBare}$.  The code quoted in this
+handout is in the \verb|cong-starter/| directory.
+
+\subsection{Instrumenting Congruence Closure (Final Submission, 40 pts)}
+
+For the final submission you will have to produce and verify the
+correctness of proofs of equality.  We reuse here the abstract type of
+$\m{path}$ in the union-find data structure, extended with two new
+constructors: $\m{hyp}\, e$ and $\m{mono}\, p\, q\, e\, e'$ to
+represent hypotheses (assumptions) and the rule of monotonicity.
+
+$\m{hyp}\, (\m{Eqn}\, a\, b)$ is a path from $a$ to $b$.  This will be
+used if the client asserts an equation $a = b$ by calling
+$\m{merge}\, \mi{cc}\, (\m{Eqn}\, a\, b)$.
+
+$\m{mono}\, p\, q\, (\m{Defn}\, c\, a\, b)\, (\m{Defn}\, c'\, a'\,
+b')$ is a path from $c$ to $c'$, if $p$ is a path from $a$ to
+$a'$ and $q$ is a path from $b$ to $b'$.  This will be used if the
+algorithm uses monotonicity to conclude
+$\m{App}\, a\, b = \m{App}\, a'\, b'$ from the equalities $a = a'$ and
+$b = b'$.
+
+Note that any equation used as an argument to $\m{hyp}$ and $\m{mono}$
+should be one directly passed into $\m{merge}$.  This could be
+enforced in a complicated manner with an additional layer of
+abstraction, but we forego this complication since the client can
+still check separately that all uses of $\m{hyp}$ and $\m{mono}$ in a
+path rely only on equations it asserted.
+
+\begin{lstlisting}
+module CongPath
+
+  use ...
+  
+  type const = int
+
+  type eqn =
+  | Defn const const const  (* c = app a b *)
+  | Eqn const const         (* c = a *)
+
+  use UnionFindPath as U
+
+  function hyp (e : eqn) : U.path
+  axiom c_hyp : forall a b.
+    U.connects (hyp (Eqn a b)) a b
+
+  function mono (p : U.path) (q : U.path) (e : eqn) (e' : eqn) : U.path
+  axiom c_mono : forall p q a a' b b' c c'.
+    U.connects p a a' -> U.connects q b b' ->
+    U.connects (mono p q (Defn c a b) (Defn c' a' b')) c c'
+
+  type cc = { size : int ;
+              uf : U.uf ;
+              mutable eqns : list eqn }
+
+  let cc_new (n : int) : cc
+  let merge (cc : cc) (e : eqn) : unit
+  let check_eq (cc : cc) (a : const) (b : const) : (bool, ghost (option U.path))
+
+end
+\end{lstlisting}
+
+We do not supply a path to $\m{merge}$ since the merge function itself
+can construct it, as explained above.
+
+For this instrumentation you may arbitrarily change your bare
+implementation, except that you should use your $\m{UnionFindPath}$.
+
+Note that your contracts should guarantee two things: (1) safety (as
+before) and (2) the path provided with the result of
+$\m{check\_eq}\, \mi{cc}\, a\, b$ when $a$ and $b$ are in fact equal,
+must go from $a$ to $b$.
+
+\begin{task}[40 pts]
+  Add paths to serve as certificates to your bare implementation as
+  specified above.
+\end{task}
+
+We recommend you test your implementation but we do not formally require
+it.  You should hand in file \verb|cong-path.mlw| with modules
+$\m{UnionFindPath}$ and $\m{CongPath}$.  The code quoted in this handout
+is in the \verb|cong-starter/| directory.
+
+\subsection{Writeup (Final Submission, 20 pts)}
+
+\begin{task}[20 pts]
+Writeup, to be handed in separately as file \verb|mp2-final.pdf|.  
+\end{task}
+
+\end{document}

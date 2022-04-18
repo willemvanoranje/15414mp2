@@ -1,0 +1,68 @@
+module Solver
+
+use int.Int
+use ref.Ref
+use list.List
+use list.Length as List
+use list.Mem
+use list.Append
+use array.Array
+use array.ArrayEq
+use option.Option
+
+use SatDefs (* From sat_base.mlw *)
+use ResolutionProof (* From resolution.mlw *)
+
+(******************************************************************************)
+(* Routines for managing solver state                                         *)
+(******************************************************************************)
+
+let rec backtrack (diff : list var) (pval : pval) =
+  () (* Implement this function *)
+
+exception Sat_found
+
+let rec set_sign (l : lit) (pval : pval) (cnf : cnf) : (bool, option clause, list var) =
+  (false, None, Nil) (* Implement this function *)
+
+
+(******************************************************************************)
+(* Main algorithm                                                             *)
+(******************************************************************************)
+
+(*
+  You should not change the following type for the checkpoint.
+  For the final submission, you should change
+    `Assignment valuation`
+  to
+    `Assignment pval`
+*)
+type solver_result =
+  | Assignment valuation
+  | Proof certificate
+
+exception Sat
+exception InvalidCert
+
+let sat (cnf : cnf) : solver_result =
+  ensures { forall t. result = Assignment t -> sat_with t cnf }     (* DO NOT CHANGE *)
+  ensures { forall p. result = Proof p -> valid_refutation p cnf }  (* DO NOT CHANGE *)
+  raises  { InvalidCert }
+
+  let t = make cnf.nvars false in
+  let rec split i =
+    variant  { cnf.nvars - i }
+    requires { 0 <= i <= cnf.nvars }
+    ensures  { array_eq_sub (old t) t 0 i }
+    raises   { Sat -> sat_with t cnf }
+
+    if i = cnf.nvars then begin
+      if eval_cnf t cnf then raise Sat
+    end
+    else begin
+      t[i] <- false ; split (i + 1) ;
+      t[i] <- true  ; split (i + 1) ;
+    end
+  in try split 0 ; raise InvalidCert with Sat -> Assignment t end
+
+end (* Solver *)

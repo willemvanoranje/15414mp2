@@ -1,0 +1,77 @@
+module UnionFindPath
+
+use int.Int
+use array.Array
+use option.Option
+
+(* BEGIN DO NOT CHANGE *)
+type elem = int
+
+type path  (* abstract *)
+function refl (x : elem) : path
+function sym (p : path) : path
+function trans (p1 : path) (x : elem) (p2 : path) : path
+
+predicate connects (p : path) (x : elem) (y : elem)
+axiom c_refl : forall x. connects (refl x) x x
+axiom c_sym : forall p x y. connects p x y -> connects (sym p) y x
+axiom c_trans : forall x y z p q.
+  connects p x y -> connects q y z -> connects (trans p y q) x z
+(* END DO NOT CHANGE *)
+
+type uf = { size : int ;
+            parent : array elem ;
+            rank : array int ;
+            ghost path : array path }
+
+predicate is_root (uf : uf) (x : elem)
+
+(* DO NOT CHANGE THE NAMES OR TYPES OF THESE FUNCTIONS *)
+let uf_new (n : int) : uf
+let find (uf : uf) (x : elem) : (elem, ghost path)
+let union (uf : uf) (x : elem) (y : elem) (ghost pxy : path) : unit
+
+end
+
+module CongPath
+
+  use int.Int
+  use list.List
+  use array.Array
+  use option.Option
+
+  (* BEGIN DO NOT CHANGE *)
+  type const = int
+
+  type eqn =
+  | Defn const const const  (* c = App a b *)
+  | Eqn const const         (* a = b *)
+
+  use UnionFindPath as U
+
+  function hyp (e : eqn) : U.path
+  axiom c_hyp : forall a b.
+    U.connects (hyp (Eqn a b)) a b
+
+  function mono (p : U.path) (q : U.path) (e : eqn) (e' : eqn) : U.path
+  axiom c_mono : forall p q a a' b b' c c'.
+    U.connects p a a' -> U.connects q b b' -> U.connects (mono p q (Defn c a b) (Defn c' a' b')) c c'
+  (* END DO NOT CHANGE *)
+
+  type cc = { size : int ;
+              uf : U.uf ;
+              mutable eqns : list eqn }
+
+  (* DO NOT CHANGE THE NAMES OR TYPES OF THESE FUNCTIONS *)
+  let cc_new (n : int) : cc
+  let merge (cc : cc) (e : eqn) : unit
+  let check_eq (cc : cc) (a : const) (b : const) : (bool, ghost (option U.path)) 
+
+end
+
+(* optional module *)
+module Test
+
+  use Cong as C
+
+end
