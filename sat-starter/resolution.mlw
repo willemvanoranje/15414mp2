@@ -13,9 +13,38 @@ module ResolutionProof
 
   use SatDefs (* From sat_base.mlw *)
 
-  type certificate = unit (* Define a type for certificates; you may want to define  *)
+  (* type resolution_chain = *)
 
-  predicate valid_refutation (p : certificate) (cnf : cnf) = false (* Specify the set of valid refutations *)
+  (* Define a type for certificates; you may want to define  *)
+  type certificate = 
+    | Assume clause 
+    | Resolve (certificate certificate lit clause) 
+
+  predicate cnf_contains (c : clause) (cnf : cnf)
+    axiom cnf_contains_axiom: forall c : clause. forall cnf : cnf. cnf_contains c cnf <-> 
+                              exists i. 0 < i < cnf.clauses.length /\ cnf.clauses[i] = c
+
+  predicate valid_resolution_chain (p : certificate) (cnf) =
+    match p with
+    | Assume _ -> cnf_contains Nil 
+    | Resolve cert1 cert2 lit res -> (
+        match (cert1, cert2) with ->
+        | (Assume clause1, Assume clause2) -> 
+          (cnf_contains clause1 cnf) /\ (cnf_contains clause2 cnf) 
+          /\ ((mem lit clause1 /\ mem {lit.var ; not(lit.sign)} clause2))
+
+        | 
+        end)
+      
+    end
+
+  predicate valid_refutation (p : certificate) (cnf : cnf)  = (* Specify the set of valid refutations *)
+    match p with
+    | Assume Nil -> cnf_contains Nil
+    | Assume (Cons x xs) -> false
+    | Resolve _ _ _ res -> res = Nil /\ valid_resolution_chain p cnf
+    end
+
 
   let check_refutation (p : certificate) (cnf : cnf) : bool
     requires { true } (* Any necessary preconditions *)
