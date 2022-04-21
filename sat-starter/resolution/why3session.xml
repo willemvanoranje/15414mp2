@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="resolution.mlw"/>
+<theory name="SatDefs" proved="true">
+ <goal name="infix ==&#39;vc" expl="VC for infix ==" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="40620"/></proof>
+ </goal>
+ <goal name="cnf&#39;vc" expl="VC for cnf" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="57985"/></proof>
+ </goal>
+ <goal name="eval_clause&#39;vc" expl="VC for eval_clause" proved="true">
+ <proof prover="2"><result status="valid" time="0.15" steps="455387"/></proof>
+ </goal>
+ <goal name="eval_cnf&#39;vc" expl="VC for eval_cnf" proved="true">
+ <proof prover="2"><result status="valid" time="0.10" steps="320350"/></proof>
+ </goal>
+ <goal name="var_in_clause&#39;vc" expl="VC for var_in_clause" proved="true">
+ <proof prover="2"><result status="valid" time="0.05" steps="184929"/></proof>
+ </goal>
+ <goal name="lit_in_clause&#39;vc" expl="VC for lit_in_clause" proved="true">
+ <proof prover="2"><result status="valid" time="0.05" steps="185623"/></proof>
+ </goal>
+ <goal name="check_clause_contained&#39;vc" expl="VC for check_clause_contained" proved="true">
+ <proof prover="1"><result status="valid" time="0.09" steps="25737"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="3030693"/></proof>
+ </goal>
+ <goal name="check_equal_clause&#39;vc" expl="VC for check_equal_clause" proved="true">
+ <proof prover="2"><result status="valid" time="0.03" steps="72160"/></proof>
+ </goal>
+ <goal name="clause_in_cnf&#39;vc" expl="VC for clause_in_cnf" proved="true">
+ <proof prover="2"><result status="valid" time="0.04" steps="178949"/></proof>
+ </goal>
+</theory>
+<theory name="ResolutionProof" proved="true">
+ <goal name="bool_eq&#39;vc" expl="VC for bool_eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="72975"/></proof>
+ </goal>
+ <goal name="lit_eq&#39;vc" expl="VC for lit_eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="5590"/></proof>
+ </goal>
+ <goal name="cnf_contains&#39;vc" expl="VC for cnf_contains" proved="true">
+ <proof prover="2"><result status="valid" time="0.07" steps="276154"/></proof>
+ </goal>
+ <goal name="clause_mem&#39;vc" expl="VC for clause_mem" proved="true">
+ <proof prover="1"><result status="valid" time="0.10" steps="28784"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.31" steps="1044949"/></proof>
+ </goal>
+ <goal name="includes_all_except_forward&#39;vc" expl="VC for includes_all_except_forward" proved="true">
+ <proof prover="0"><result status="valid" time="0.20" steps="1976"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="219835"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.32" steps="1087256"/></proof>
+ </goal>
+ <goal name="includes_all_except_reverse&#39;vc" expl="VC for includes_all_except_reverse" proved="true">
+ <proof prover="0"><result status="valid" time="0.07" steps="625"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="243942"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.30" steps="1071826"/></proof>
+ </goal>
+ <goal name="includes_all_except&#39;vc" expl="VC for includes_all_except" proved="true">
+ <proof prover="1"><result status="valid" time="0.22" steps="59125"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.33" steps="1193602"/></proof>
+ </goal>
+ <goal name="valid_resolution_fn&#39;vc" expl="VC for valid_resolution_fn" proved="true">
+ <proof prover="2"><result status="valid" time="0.16" steps="574721"/></proof>
+ </goal>
+ <goal name="valid_resolution_chain_fn&#39;vc" expl="VC for valid_resolution_chain_fn" proved="true">
+ <proof prover="1"><result status="valid" time="0.13" steps="44129"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.32" steps="1130823"/></proof>
+ </goal>
+ <goal name="check_refutation&#39;vc" expl="VC for check_refutation" proved="true">
+ <proof prover="1"><result status="valid" time="0.07" steps="24327"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.31" steps="1239476"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
