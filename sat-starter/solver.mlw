@@ -41,28 +41,106 @@ type solver_result =
   | Assignment valuation
   | Proof certificate
 
+(*define a type for producing certificate*)
+type certChain =
+  | Chain certificate
+  | Empty   (*Help distinguish where nothing is found yet*)
+
 exception Sat
 exception InvalidCert
+
+
+let rec valid_counter_clause (c : clause) (rho : valuation) (lit : lit) =
+    match c with
+        | Nil -> true
+        | Cons l ls -> (if l.var > lit.var then false 
+                       else 
+                        (if l.var = lit.var then 
+                            (if lit.sign = l.sign then false
+                            else valid_counter_clause ls rho lit )
+                         else 
+                            (if rho[l.var] = l.sign then false
+                            else valid_counter_clause ls rho lit ) ) )
+    end
+
+let search_for_ref (rho : valuation) (cnf : cnf) (lit : lit): certChain =
+    let ref i = 0 in
+    let ref res = Empty in
+    while i < (length cnf.clauses)
+    do
+        (*check if current clause satisfies conflict*)
+        if (var_in_clause lit cnf[i] && valid_counter_clause cnf[i] rho lit)
+        then res <- Chain (Assume cnf[i]) ; i <- length cnf.clauses
+        else i <- i+1
+    done;
+    res
+
+let get_unit_ref (rho : rho) (cnf : cnf) (lit : lit) (prev : certChain) : certChain =
+    match prev with
+        | Empty -> (search_for_ref rho cnf lit)
+        | _ -> prev
+    end
+
+let rec clause_combine_except (cl : clause) (var: var) : clause =
+    match cl with 
+        | Nil -> Nil
+        | Cons x xs -> (let newCl = (clause_combine_except xs var ) in
+                if mem x newCl then newCl else 
+                    (if x.var = var then newCl else (Cons x newCl) )
+                end)
+    end
+
+let apply_resolution (cert1: certificate) (cert2: certificate) (var : var) : certChain =
+    (*must have true var on left and false on right*)
+    let ref cl = Nil in
+    match (cert1, cert2) with
+        | (Assume clause1, Assume clause2) ->
+            cl <- (clause_combine_except (cert1 ++ cert2) var)
+        | (Resolve _ _ _ clause1, Assume clause2) ->
+            cl <- (clause_combine_except (cert1 ++ cert2) var)
+        | (Assume clause1, Resolve _ _ _ clause2) -> 
+            cl <- (clause_combine_except (cert1 ++ cert2) var)
+        | (Resolve _ _ _ clause1, Resolve _ _ _ clause2) ->
+            cl <- (clause_combine_except (cert1 ++ cert2) var)
+    end;
+    {Chain (Resolve cert1 cert2 var cl)}
+
+
 
 let sat (cnf : cnf) : solver_result =
   ensures { forall t. result = Assignment t -> sat_with t cnf }     (* DO NOT CHANGE *)
   ensures { forall p. result = Proof p -> valid_refutation p cnf }  (* DO NOT CHANGE *)
   raises  { InvalidCert }
 
-  let t = make cnf.nvars false in
-  let rec split i =
+  let t = make cnf.nvars false in 
+  let rec split i : certChain =
     variant  { cnf.nvars - i }
     requires { 0 <= i <= cnf.nvars }
     ensures  { array_eq_sub (old t) t 0 i }
     raises   { Sat -> sat_with t cnf }
 
     if i = cnf.nvars then begin
-      if eval_cnf t cnf then raise Sat
+      if eval_cnf t cnf then raise Sat else Empty
     end
     else begin
-      t[i] <- false ; split (i + 1) ;
-      t[i] <- true  ; split (i + 1) ;
+      let ref left = Empty in
+      let ref right = Empty in
+      t[i] <- false ; left <- split (i + 1) ;
+      t[i] <- true  ; right <- split (i + 1) ;
+      (*Conflict reached, attempt to generate cert*)
+      let ref procLeft = get_unit_ref t cnf ({var=i ;sign=false }) left in
+      let ref procRight = get_unit_ref t cnf ({var=i ;sign=true }) right in
+      match (procLeft, procRight) with
+        | (Empty, Empty) -> Empty
+        | (Empty, Chain cert) -> Empty (* think more abt these cases *)
+        | (Chain cert, Empty) -> Empty  (* *)
+        | (Chain cert1, Chain cert2) -> (apply_resolution cert1 cert2 i) (**)
+        end 
     end
-  in try split 0 ; raise InvalidCert with Sat -> Assignment t end
+  in try ( match split 0 with 
+        | Empty -> raise InvalidCert
+        | Chain cert -> if (check_refutation cert) then ({Proof cert}) else raise InvalidCert
+        end )
+    with Sat -> Assignment t end
 
 end (* Solver *)
