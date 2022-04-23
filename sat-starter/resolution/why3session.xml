@@ -39,42 +39,94 @@
 </theory>
 <theory name="ResolutionProof" proved="true">
  <goal name="bool_eq&#39;vc" expl="VC for bool_eq" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="72975"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="73027"/></proof>
  </goal>
  <goal name="lit_eq&#39;vc" expl="VC for lit_eq" proved="true">
  <proof prover="2"><result status="valid" time="0.02" steps="5590"/></proof>
  </goal>
  <goal name="cnf_contains&#39;vc" expl="VC for cnf_contains" proved="true">
- <proof prover="2"><result status="valid" time="0.07" steps="276154"/></proof>
+ <proof prover="2"><result status="valid" time="0.07" steps="276206"/></proof>
  </goal>
  <goal name="clause_mem&#39;vc" expl="VC for clause_mem" proved="true">
- <proof prover="1"><result status="valid" time="0.10" steps="28784"/></proof>
- <proof prover="2"><result status="highfailure" time="0.31" steps="1044949"/></proof>
+ <proof prover="1"><result status="valid" time="0.10" steps="28748"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="2867250"/></proof>
  </goal>
  <goal name="includes_all_except_forward&#39;vc" expl="VC for includes_all_except_forward" proved="true">
- <proof prover="0"><result status="valid" time="0.20" steps="1976"/></proof>
- <proof prover="1"><result status="timeout" time="1.00" steps="219835"/></proof>
- <proof prover="2"><result status="highfailure" time="0.32" steps="1087256"/></proof>
+ <proof prover="0"><result status="valid" time="0.20" steps="1966"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="284897"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="2605666"/></proof>
  </goal>
  <goal name="includes_all_except_reverse&#39;vc" expl="VC for includes_all_except_reverse" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="625"/></proof>
- <proof prover="1"><result status="timeout" time="1.00" steps="243942"/></proof>
- <proof prover="2"><result status="highfailure" time="0.30" steps="1071826"/></proof>
+ <proof prover="0" obsolete="true"><result status="valid" time="0.07" steps="625"/></proof>
+ <proof prover="1"><result status="valid" time="0.26" steps="79554"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="2656120"/></proof>
  </goal>
  <goal name="includes_all_except&#39;vc" expl="VC for includes_all_except" proved="true">
- <proof prover="1"><result status="valid" time="0.22" steps="59125"/></proof>
- <proof prover="2"><result status="highfailure" time="0.33" steps="1193602"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.22" steps="59125"/></proof>
+ <proof prover="2"><result status="valid" time="0.53" steps="2201417"/></proof>
  </goal>
  <goal name="valid_resolution_fn&#39;vc" expl="VC for valid_resolution_fn" proved="true">
- <proof prover="2"><result status="valid" time="0.16" steps="574721"/></proof>
+ <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="603017"/></proof>
+ <proof prover="2"><result status="valid" time="0.09" steps="387591"/></proof>
+ <transf name="split_vc" >
+  <goal name="valid_resolution_fn&#39;vc.0" expl="postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="582836"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.43" steps="1552098"/></proof>
+  <transf name="split_vc" >
+   <goal name="valid_resolution_fn&#39;vc.0.0" expl="postcondition">
+   <proof prover="0" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00"/></proof>
+   <proof prover="1" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00" steps="2026317"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="highfailure" time="2.79" steps="7821164"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.1" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.02" steps="6649"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.2" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.07" steps="267703"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.3" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="107258"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.4" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="101421"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="valid_resolution_fn&#39;vc.1" expl="postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="590744"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.44" steps="1549623"/></proof>
+  <transf name="split_vc" >
+   <goal name="valid_resolution_fn&#39;vc.1.0" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.10" steps="336291"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.1" expl="postcondition">
+   <proof prover="0" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00"/></proof>
+   <proof prover="1" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00" steps="2420626"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="highfailure" time="2.90" steps="6903056"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.2" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.06" steps="245730"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.3" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="111135"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.4" expl="postcondition">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="105195"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="valid_resolution_chain_fn&#39;vc" expl="VC for valid_resolution_chain_fn" proved="true">
- <proof prover="1"><result status="valid" time="0.13" steps="44129"/></proof>
- <proof prover="2"><result status="highfailure" time="0.32" steps="1130823"/></proof>
+ <proof prover="1"><result status="valid" time="0.13" steps="43776"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="3302754"/></proof>
  </goal>
  <goal name="check_refutation&#39;vc" expl="VC for check_refutation" proved="true">
- <proof prover="1"><result status="valid" time="0.07" steps="24327"/></proof>
- <proof prover="2"><result status="highfailure" time="0.31" steps="1239476"/></proof>
+ <proof prover="1"><result status="valid" time="0.07" steps="24287"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00" steps="3598241"/></proof>
  </goal>
 </theory>
 </file>

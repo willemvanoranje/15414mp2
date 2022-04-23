@@ -197,7 +197,7 @@ module ResolutionProof
   (* Define a type for certificates; you may want to define  *)
   type certificate = 
     | Assume clause 
-    | Resolve certificate certificate lit clause 
+    | Resolve certificate certificate var clause 
 
   let rec function bool_eq (b1 : bool) (b2 : bool)
     ensures { result <-> (b1 <-> b2) }
@@ -230,33 +230,33 @@ module ResolutionProof
     done ;
     contains
   
-  predicate valid_resolution (clause1 : clause) (clause2: clause) (lit : lit) (res : clause) 
-    axiom val_res_axiom: forall clause1,clause2,res : clause. forall cnf : cnf. forall lit : lit.
-                         (valid_resolution clause1 clause2 lit res) <->
-                        ((mem lit clause1 /\ mem ({var=lit.var; sign=not(lit.sign)}) clause2)
-                          \/ (mem ({var=lit.var; sign=not(lit.sign)}) clause2 /\ mem lit clause2))
-                      /\ (forall remaining : lit. remaining.var <> lit.var 
+  predicate valid_resolution (clause1 : clause) (clause2: clause) (v : var) (res : clause) 
+    axiom val_res_axiom: forall clause1,clause2,res : clause. forall cnf : cnf. forall v: var.
+                         (valid_resolution clause1 clause2 v res) <->
+                        ((mem ({var=v; sign=true}) clause1 /\ mem ({var=v; sign=false}) clause2)
+                          \/ (mem ({var=v; sign=false}) clause2 /\ mem ({var=v; sign=true}) clause2))
+                      /\ (forall remaining : lit. remaining.var <> v 
                           /\ ((mem remaining clause1) \/ (mem remaining clause2)) 
                           <-> mem remaining res)
 
   predicate valid_resolution_chain (p : certificate) (cnf : cnf) =
     match p with
     | Assume _ -> cnf_contains Nil cnf
-    | Resolve cert1 cert2 lit res -> (
+    | Resolve cert1 cert2 var res -> (
         match (cert1, cert2) with
         | (Assume clause1, Assume clause2) -> 
           cnf_contains clause1 cnf /\ cnf_contains clause2 cnf
-          /\ valid_resolution clause1 clause2 lit res
+          /\ valid_resolution clause1 clause2 var res
         | (Resolve _ _ _ clause1, Assume clause2) -> 
           cnf_contains clause2 cnf 
-          /\ valid_resolution clause1 clause2 lit res 
+          /\ valid_resolution clause1 clause2 var res 
           /\ valid_resolution_chain cert1 cnf
         | (Assume clause1, Resolve _ _ _ clause2) -> 
           cnf_contains clause1 cnf 
-          /\ valid_resolution clause1 clause2 lit res 
+          /\ valid_resolution clause1 clause2 var res 
           /\ valid_resolution_chain cert2 cnf
         | (Resolve _ _ _ clause1, Resolve _ _ _ clause2) ->
-          valid_resolution clause1 clause2 lit res 
+          valid_resolution clause1 clause2 var res 
           /\ valid_resolution_chain cert1 cnf 
           /\ valid_resolution_chain cert2 cnf
         end)
@@ -277,70 +277,70 @@ module ResolutionProof
     | Cons x xs -> lit_eq lit x || clause_mem lit xs
     end
 
-  let rec includes_all_except_forward (lit : lit) (res : clause) (clause1 : clause) (clause2 : clause)
-    ensures { result <-> (forall remaining : lit. remaining.var <> lit.var 
+  let rec includes_all_except_forward (v : var) (res : clause) (clause1 : clause) (clause2 : clause)
+    ensures { result <-> (forall remaining : lit. remaining.var <> v 
                           /\ ((clause_mem remaining clause1) \/ (clause_mem remaining clause2)) 
                           -> clause_mem remaining res) }
     variant { List.length clause1 + List.length clause2 }
     = match (clause1, clause2) with
     | (Nil, Nil) -> true
     | (Cons x xs, _) -> 
-      if x.var <> lit.var then 
-        clause_mem x res && includes_all_except_forward lit res xs clause2
-      else includes_all_except_forward lit res xs clause2
+      if x.var <> v then 
+        clause_mem x res && includes_all_except_forward v res xs clause2
+      else includes_all_except_forward v res xs clause2
     | (_, Cons x xs) ->
-      if x.var <> lit.var then 
-        clause_mem x res && includes_all_except_forward lit res clause1 xs
-      else includes_all_except_forward lit res clause1 xs
+      if x.var <> v then 
+        clause_mem x res && includes_all_except_forward v res clause1 xs
+      else includes_all_except_forward v res clause1 xs
     end
 
-  let rec includes_all_except_reverse (lit : lit) (res : clause) (clause1 : clause) (clause2 : clause)
-    ensures {result <-> (forall remaining : lit. clause_mem remaining res ->
-                         remaining.var <> lit.var 
+  let rec includes_all_except_reverse (v : var) (res : clause) (clause1 : clause) (clause2 : clause)
+    ensures {result <-> (forall remaining : lit. mem remaining res ->
+                         remaining.var <> v 
                          /\ ((clause_mem remaining clause1) \/ (clause_mem remaining clause2))) }
     variant { res }
     = match res with
     | Nil -> true
     | Cons x xs -> 
-      x.var <> lit.var && (clause_mem x clause1 || clause_mem x clause2) 
-      && includes_all_except_reverse lit xs clause1 clause2
+      x.var <> v && (clause_mem x clause1 || clause_mem x clause2) 
+      && includes_all_except_reverse v xs clause1 clause2
     end
 
-  let includes_all_except (lit : lit) (res : clause) (clause1 : clause) (clause2 : clause)
-    ensures {result <-> (forall remaining : lit. remaining.var <> lit.var 
+  let includes_all_except (v : var) (res : clause) (clause1 : clause) (clause2 : clause)
+    ensures {result <-> (forall remaining : lit. remaining.var <> v 
                           /\ ((mem remaining clause1) \/ (mem remaining clause2)) 
                           <-> mem remaining res) }
-    = includes_all_except_forward lit res clause1 clause2 
-      && includes_all_except_reverse lit res clause1 clause2
+    = includes_all_except_forward v res clause1 clause2 
+      && includes_all_except_reverse v res clause1 clause2
     
-  let valid_resolution_fn (clause1 : clause) (clause2: clause) (lit : lit) (res : clause)  : bool
-    ensures { result <-> valid_resolution clause1 clause2 lit res }
-    = ((clause_mem lit clause1
-        && clause_mem ({var=lit.var; sign=not(lit.sign)}) clause2)
-      || (clause_mem ({var=lit.var; sign=not(lit.sign)}) clause2
-        && clause_mem lit clause2))
-    && includes_all_except lit res clause1 clause2
+  let valid_resolution_fn (clause1 : clause) (clause2: clause) (v : var) (res : clause)  : bool
+    ensures { result <-> valid_resolution clause1 clause2 v res }
+    = ((clause_mem ({var=v; sign=true}) clause1
+        && clause_mem ({var=v; sign=false}) clause2)
+      || (clause_mem ({var=v; sign=false}) clause2
+        && clause_mem ({var=v; sign=true}) clause2))
+    && includes_all_except v res clause1 clause2
 
   let rec valid_resolution_chain_fn (p : certificate) (cnf : cnf) : bool
     ensures { result <-> valid_resolution_chain p cnf }
     variant { p }
     = match p with
     | Assume _ -> cnf_contains Nil cnf
-    | Resolve cert1 cert2 lit res -> (
+    | Resolve cert1 cert2 var res -> (
         match (cert1, cert2) with
         | (Assume clause1, Assume clause2) -> 
           cnf_contains clause1 cnf && cnf_contains clause2 cnf
-          && valid_resolution_fn clause1 clause2 lit res
+          && valid_resolution_fn clause1 clause2 var res
         | (Resolve _ _ _ clause1, Assume clause2) -> 
           cnf_contains clause2 cnf 
-          && valid_resolution_fn clause1 clause2 lit res 
+          && valid_resolution_fn clause1 clause2 var res 
           && valid_resolution_chain_fn cert1 cnf
         | (Assume clause1, Resolve _ _ _ clause2) -> 
           cnf_contains clause1 cnf 
-          && valid_resolution_fn clause1 clause2 lit res 
+          && valid_resolution_fn clause1 clause2 var res 
           && valid_resolution_chain_fn cert2 cnf
         | (Resolve _ _ _ clause1, Resolve _ _ _ clause2) ->
-          valid_resolution_fn clause1 clause2 lit res 
+          valid_resolution_fn clause1 clause2 var res 
           && valid_resolution_chain_fn cert1 cnf 
           && valid_resolution_chain_fn cert2 cnf
         end)
