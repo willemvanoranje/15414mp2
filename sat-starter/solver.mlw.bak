@@ -415,6 +415,7 @@ exception InvalidCert
 
 let rec valid_counter_clause (c : clause) (rho : valuation) (lit : lit) : bool =
     requires{vars_in_range rho.length c}
+    (*requires{ 0 <= lit.var < rho.length } *)
     diverges
     match c with
         | Nil -> true

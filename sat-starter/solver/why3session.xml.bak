@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="solver.mlw"/>
+<theory name="SatDefs" proved="true">
+ <goal name="infix ==&#39;vc" expl="VC for infix ==" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02" steps="38799"/></proof>
+ </goal>
+ <goal name="cnf&#39;vc" expl="VC for cnf" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02" steps="55216"/></proof>
+ </goal>
+ <goal name="eval_clause&#39;vc" expl="VC for eval_clause" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.18" steps="574791"/></proof>
+ </goal>
+ <goal name="eval_cnf&#39;vc" expl="VC for eval_cnf" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.07" steps="227931"/></proof>
+ </goal>
+ <goal name="var_in_clause&#39;vc" expl="VC for var_in_clause" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.03" steps="70945"/></proof>
+ </goal>
+ <goal name="lit_in_clause&#39;vc" expl="VC for lit_in_clause" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.05" steps="192977"/></proof>
+ </goal>
+ <goal name="check_clause_contained&#39;vc" expl="VC for check_clause_contained" proved="true">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.10" steps="25737"/></proof>
+ <proof prover="2" timelimit="5"><result status="highfailure" time="4.09"/></proof>
+ </goal>
+ <goal name="check_equal_clause&#39;vc" expl="VC for check_equal_clause" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02" steps="69113"/></proof>
+ </goal>
+ <goal name="clause_in_cnf&#39;vc" expl="VC for clause_in_cnf" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.05" steps="161071"/></proof>
+ </goal>
+</theory>
+<theory name="ResolutionProof" proved="true">
+ <goal name="bool_eq&#39;vc" expl="VC for bool_eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="69871"/></proof>
+ </goal>
+ <goal name="lit_eq&#39;vc" expl="VC for lit_eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="5599"/></proof>
+ </goal>
+ <goal name="cnf_contains&#39;vc" expl="VC for cnf_contains" proved="true">
+ <proof prover="2"><result status="valid" time="0.07" steps="254262"/></proof>
+ </goal>
+ <goal name="clause_mem&#39;vc" expl="VC for clause_mem" proved="true">
+ <proof prover="1"><result status="valid" time="0.08" steps="28748"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.30"/></proof>
+ </goal>
+ <goal name="includes_all_except_forward&#39;vc" expl="VC for includes_all_except_forward" proved="true">
+ <proof prover="0"><result status="valid" time="0.16" steps="1966"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="267744"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.28"/></proof>
+ </goal>
+ <goal name="includes_all_except_reverse&#39;vc" expl="VC for includes_all_except_reverse" proved="true">
+ <proof prover="1"><result status="valid" time="0.27" steps="79554"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.32"/></proof>
+ </goal>
+ <goal name="includes_all_except&#39;vc" expl="VC for includes_all_except" proved="true">
+ <proof prover="2"><result status="valid" time="0.10" steps="351889"/></proof>
+ </goal>
+ <goal name="valid_resolution_fn&#39;vc" expl="VC for valid_resolution_fn" proved="true">
+ <proof prover="2"><result status="valid" time="0.09" steps="322130"/></proof>
+ </goal>
+ <goal name="valid_resolution_chain_fn&#39;vc" expl="VC for valid_resolution_chain_fn" proved="true">
+ <proof prover="1"><result status="valid" time="0.12" steps="43776"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.44"/></proof>
+ </goal>
+ <goal name="check_refutation&#39;vc" expl="VC for check_refutation" proved="true">
+ <proof prover="1"><result status="valid" time="0.06" steps="24287"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.44"/></proof>
+ </goal>
+</theory>
+<theory name="Solver">
+ <goal name="valid_counter_clause&#39;vc" expl="VC for valid_counter_clause">
+ <proof prover="0"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="889973"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <transf name="split_vc" >
+  <goal name="valid_counter_clause&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="10549"/></proof>
+  </goal>
+  <goal name="valid_counter_clause&#39;vc.1" expl="index in array bounds">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="1032791"/></proof>
+  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  <transf name="split_vc" >
+   <goal name="valid_counter_clause&#39;vc.1.0" expl="index in array bounds">
+   <proof prover="0" timelimit="10" memlimit="4000"><result status="timeout" time="10.00"/></proof>
+   <proof prover="1" timelimit="10" memlimit="4000"><result status="timeout" time="10.00" steps="12807404"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="highfailure" time="5.35"/></proof>
+   </goal>
+   <goal name="valid_counter_clause&#39;vc.1.1" expl="index in array bounds" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="103109"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="valid_counter_clause&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="10573"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="search_for_ref&#39;vc" expl="VC for search_for_ref">
+ <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="674687"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.27"/></proof>
+ <transf name="split_vc" >
+  <goal name="search_for_ref&#39;vc.0" expl="index in array bounds">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="674729"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.30"/></proof>
+  <transf name="split_vc" >
+   <goal name="search_for_ref&#39;vc.0.0" expl="index in array bounds">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="532396"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="failure" time="0.00"/></proof>
+   </goal>
+   <goal name="search_for_ref&#39;vc.0.1" expl="index in array bounds">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.01" steps="7252"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="search_for_ref&#39;vc.1" expl="index in array bounds">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="326788"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.31"/></proof>
+  <transf name="split_vc" >
+   <goal name="search_for_ref&#39;vc.1.0" expl="index in array bounds">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="325383"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="failure" time="0.00"/></proof>
+   </goal>
+   <goal name="search_for_ref&#39;vc.1.1" expl="index in array bounds">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.01" steps="7286"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="search_for_ref&#39;vc.2" expl="precondition">
+  </goal>
+  <goal name="search_for_ref&#39;vc.3" expl="termination">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="325444"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.32"/></proof>
+  <transf name="split_vc" >
+   <goal name="search_for_ref&#39;vc.3.0" expl="termination">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="455988"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="search_for_ref&#39;vc.4" expl="index in array bounds">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="326788"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.31"/></proof>
+  <transf name="split_vc" >
+   <goal name="search_for_ref&#39;vc.4.0" expl="index in array bounds">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="325383"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="failure" time="0.00"/></proof>
+   </goal>
+   <goal name="search_for_ref&#39;vc.4.1" expl="index in array bounds">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.01" steps="7286"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="search_for_ref&#39;vc.5" expl="termination">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="325231"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.30"/></proof>
+  <transf name="split_vc" >
+   <goal name="search_for_ref&#39;vc.5.0" expl="termination">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="325417"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="search_for_ref&#39;vc.6" expl="index in array bounds">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.01" steps="3796"/></proof>
+  </goal>
+  <goal name="search_for_ref&#39;vc.7" expl="termination">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="532675"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.30"/></proof>
+  <transf name="split_vc" >
+   <goal name="search_for_ref&#39;vc.7.0" expl="termination">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="534737"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="get_unit_ref&#39;vc" expl="VC for get_unit_ref">
+ <proof prover="0"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="673024"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.31"/></proof>
+ <transf name="split_vc" >
+  <goal name="get_unit_ref&#39;vc.0" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="674179"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.30"/></proof>
+  <transf name="split_vc" >
+   <goal name="get_unit_ref&#39;vc.0.0" expl="termination">
+   <proof prover="0"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="674099"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="clause_combine_except&#39;vc" expl="VC for clause_combine_except">
+ <proof prover="0"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="672597"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.32"/></proof>
+ <transf name="split_vc" >
+  <goal name="clause_combine_except&#39;vc.0" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="672711"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.29"/></proof>
+  <transf name="split_vc" >
+   <goal name="clause_combine_except&#39;vc.0.0" expl="termination">
+   <proof prover="0"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="675231"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="apply_resolution&#39;vc" expl="VC for apply_resolution">
+ <proof prover="0"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00" steps="549872"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.31"/></proof>
+ <transf name="split_vc" >
+  <goal name="apply_resolution&#39;vc.0" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="236748"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.30"/></proof>
+  <transf name="split_vc" >
+   <goal name="apply_resolution&#39;vc.0.0" expl="termination">
+   <proof prover="0"><result status="failure" time="0.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="369257"/></proof>
+   <proof prover="2"><result status="highfailure" time="0.29"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="apply_resolution&#39;vc.1" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="236760"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.30"/></proof>
+  <transf name="split_vc" >
+   <goal name="apply_resolution&#39;vc.1.0" expl="termination">
+   <proof prover="0"><result status="failure" time="0.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="551482"/></proof>
+   <proof prover="2"><result status="highfailure" time="0.30"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="apply_resolution&#39;vc.2" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="236760"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.28"/></proof>
+  <transf name="split_vc" >
+   <goal name="apply_resolution&#39;vc.2.0" expl="termination">
+   <proof prover="0"><result status="failure" time="0.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="551482"/></proof>
+   <proof prover="2"><result status="highfailure" time="0.28"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="apply_resolution&#39;vc.3" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="236772"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.32"/></proof>
+  <transf name="split_vc" >
+   <goal name="apply_resolution&#39;vc.3.0" expl="termination">
+   <proof prover="0"><result status="failure" time="0.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="551494"/></proof>
+   <proof prover="2"><result status="highfailure" time="0.27"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sat&#39;vc" expl="VC for sat" proved="true">
+ <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="676801"/></proof>
+ <proof prover="2"><result status="valid" time="0.10" steps="356434"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="sat&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="98686"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="103396"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.2" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="6971"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="106538"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.4" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="107304"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="51132"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="104773"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.7" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="108458"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="51834"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="106121"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.10" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="154"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="507251"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.31"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.11" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="154"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="507252"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.29"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="154"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="507252"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.31"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="154"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="507253"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.30"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.14" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="7148"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.15" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="7059"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="99538"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="6954"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="3617"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6965"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="50389"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="3621"/></proof>
+  </goal>
+  <goal name="sat&#39;vc.13" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="426839"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.31"/></proof>
+  <transf name="split_vc" >
+   <goal name="sat&#39;vc.13.0" expl="termination">
+   <proof prover="0"><result status="failure" time="0.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="414228"/></proof>
+   <proof prover="2"><result status="highfailure" time="0.29"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sat&#39;vc.17" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="688936"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.29"/></proof>
+  <transf name="split_vc" >
+   <goal name="sat&#39;vc.17.0" expl="termination">
+   <proof prover="0"><result status="failure" time="0.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="416137"/></proof>
+   <proof prover="2"><result status="highfailure" time="0.28"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sat&#39;vc.7" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="859821"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.31"/></proof>
+  <transf name="split_vc" >
+   <goal name="sat&#39;vc.7.0" expl="termination">
+   <proof prover="0"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="481997"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sat&#39;vc.22" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="532781"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.29"/></proof>
+  <transf name="split_vc" >
+   <goal name="sat&#39;vc.22.0" expl="termination">
+   <proof prover="0"><result status="failure" time="0.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="674701"/></proof>
+   <proof prover="2"><result status="highfailure" time="0.28"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sat&#39;vc.11" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="606971"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.30"/></proof>
+  <transf name="split_vc" >
+   <goal name="sat&#39;vc.11.0" expl="termination">
+   <proof prover="0"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="741270"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sat&#39;vc.12" expl="termination">
+  <proof prover="0"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00" steps="688934"/></proof>
+  <proof prover="2"><result status="highfailure" time="0.29"/></proof>
+  <transf name="split_vc" >
+   <goal name="sat&#39;vc.12.0" expl="termination">
+   <proof prover="0"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1"><result status="timeout" time="1.00" steps="426860"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="failure" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
