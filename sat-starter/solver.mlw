@@ -92,18 +92,23 @@ let rec clause_combine_except (cl : clause) (var: var) : clause =
 
 let apply_resolution (cert1: certificate) (cert2: certificate) (var : var) : certChain =
     (*must have true var on left and false on right*)
-    let ref cl = Nil in
+    let ref cl1 = Nil in
+    let ref cl2 = Nil in
     match (cert1, cert2) with
         | (Assume clause1, Assume clause2) ->
-            cl <- (clause_combine_except (cert1 ++ cert2) var)
+            cl1 <- clause1 ; cl2 <-clause2
         | (Resolve _ _ _ clause1, Assume clause2) ->
-            cl <- (clause_combine_except (cert1 ++ cert2) var)
+            cl1 <- clause1 ; cl2 <-clause2
         | (Assume clause1, Resolve _ _ _ clause2) -> 
-            cl <- (clause_combine_except (cert1 ++ cert2) var)
+            cl1 <- clause1 ; cl2 <-clause2
         | (Resolve _ _ _ clause1, Resolve _ _ _ clause2) ->
-            cl <- (clause_combine_except (cert1 ++ cert2) var)
+            cl1 <- clause1 ; cl2 <-clause2 
     end;
-    {Chain (Resolve cert1 cert2 var cl)}
+    if ( var_in_clause var cl1 && var_in_clause var cl2 ) then 
+       Chain Resolve cert1 cert2 ( clause_combine_except (cl1 ++ cl2) var )
+    else
+       Chain cert1  (*choose left naively: left right should be same (only difference is in 
+                     the )*)
 
 
 
@@ -132,8 +137,8 @@ let sat (cnf : cnf) : solver_result =
       let ref procRight = get_unit_ref t cnf ({var=i ;sign=true }) right in
       match (procLeft, procRight) with
         | (Empty, Empty) -> Empty
-        | (Empty, Chain cert) -> Empty (* think more abt these cases *)
-        | (Chain cert, Empty) -> Empty  (* *)
+        | (Empty, _) -> procRight
+        | (_, Empty) -> procLeft  
         | (Chain cert1, Chain cert2) -> (apply_resolution cert1 cert2 i) (**)
         end 
     end
