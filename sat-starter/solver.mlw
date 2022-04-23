@@ -418,39 +418,34 @@ let rec valid_counter_clause (c : clause) (rho : valuation) (lit : lit) : bool =
         | Nil -> true
         | Cons l ls -> (if l.var > lit.var then false 
                        else 
-                        (if l.var = lit.var then 
-                            (if lit.sign = l.sign then false
-                            else valid_counter_clause ls rho lit )
+                        (if (l.var = lit.var) then 
+                            (if (bool_eq l.sign lit.sign) then false
+                            else (valid_counter_clause ls rho lit ))
                          else 
-                            (if rho[l.var] = l.sign then false
-                            else valid_counter_clause ls rho lit ) ) )
+                            (if (bool_eq rho[l.var] l.sign) then false
+                            else (valid_counter_clause ls rho lit ) ) ) )
     end
 
-let search_for_ref (rho : valuation) (cnf : cnf) (lit : lit): certChain =
-    let ref i = 0 in
-    let ref res = Empty in
-    while i < (length cnf.clauses)
-    do
+let rec search_for_ref (rho : valuation) (cnf : cnf) (lit : lit) (i : int) : certChain =
+    if ( i < (length cnf.clauses) ) then
         (*check if current clause satisfies conflict*)
-        if (var_in_clause lit cnf[i] && valid_counter_clause cnf[i] rho lit)
-        then res <- Chain (Assume cnf[i]) ; i <- length cnf.clauses
-        else i <- i+1
-    done;
-    res
+        ( if ( (var_in_clause lit.var cnf.clauses[i]) && (valid_counter_clause cnf.clauses[i] rho lit) )
+         then ( Chain (Assume cnf.clauses[i]) )
+         else (search_for_ref rho cnf lit (i+1)) )
+    else Empty
 
-let get_unit_ref (rho : rho) (cnf : cnf) (lit : lit) (prev : certChain) : certChain =
+let get_unit_ref (rho : valuation) (cnf : cnf) (lit : lit) (prev : certChain) : certChain =
     match prev with
-        | Empty -> (search_for_ref rho cnf lit)
+        | Empty -> (search_for_ref rho cnf lit 0)
         | _ -> prev
     end
 
-let rec clause_combine_except (cl : clause) (var: var) : clause =
+let rec clause_combine_except (cl : clause) (v: var) : clause =
     match cl with 
         | Nil -> Nil
-        | Cons x xs -> (let newCl = (clause_combine_except xs var ) in
-                if mem x newCl then newCl else 
-                    (if x.var = var then newCl else (Cons x newCl) )
-                end)
+        | Cons x xs -> (let newCl = (clause_combine_except xs v ) in
+                if (lit_in_clause x newCl) then newCl else 
+                    (if (x.var = v) then newCl else (Cons x newCl) ) )
     end
 
 let apply_resolution (cert1: certificate) (cert2: certificate) (var : var) : certChain =
@@ -468,7 +463,7 @@ let apply_resolution (cert1: certificate) (cert2: certificate) (var : var) : cer
             cl1 <- clause1 ; cl2 <-clause2 
     end;
     if ( var_in_clause var cl1 && var_in_clause var cl2 ) then 
-       Chain Resolve cert1 cert2 ( clause_combine_except (cl1 ++ cl2) var )
+       Chain (Resolve cert1 cert2 var ( clause_combine_except (cl1 ++ cl2) var ))
     else
        Chain cert1  (*choose left naively: left right should be same (only difference is in 
                      the )*)
@@ -507,7 +502,7 @@ let sat (cnf : cnf) : solver_result =
     end
   in try ( match split 0 with 
         | Empty -> raise InvalidCert
-        | Chain cert -> if (check_refutation cert) then ({Proof cert}) else raise InvalidCert
+        | Chain cert -> if (check_refutation cert cnf) then (Proof cert) else raise InvalidCert
         end )
     with Sat -> Assignment t end
 
