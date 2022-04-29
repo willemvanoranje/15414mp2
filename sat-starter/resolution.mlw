@@ -51,6 +51,10 @@ predicate sat_with (rho : valuation) (cnf : cnf) =      (* DO NOT CHANGE *)
   forall i:int. 0 <= i < length cnf.clauses ->
   clause_sat_with rho cnf.clauses[i]
 
+let rec function bool_eq (b1 : bool) (b2 : bool)
+  ensures { result <-> (b1 <-> b2) }
+  = (b1 && b2) || (not(b1) && not(b2)) 
+    
 let rec eval_clause (rho : valuation) (c : clause) : bool =
   variant { c }
   requires { vars_in_range (length rho) c }
@@ -72,54 +76,6 @@ let eval_cnf (rho : array bool) (cnf : cnf) : bool =
       sat := false
   done ;
   !sat
-
-(******************************************************************************)
-(* Partial valuations                                                         *)
-(******************************************************************************)
-
-type pval = array (option bool)                         (* DO NOT CHANGE *)
-
-predicate valid_pval (pval : pval) (cnf : cnf) =
-  length pval = cnf.nvars                               (* DO NOT CHANGE *)
-
-predicate pval_eq (pval pval' : pval) = array_eq pval pval'
-
-predicate assigned (pval : pval) (v : var) = pval[v] <> None
-
-predicate compatible (pval : pval) (rho : valuation) =
-  forall i:int, b:bool. 0 <= i < length pval ->
-  pval[i] = Some b -> rho[i] = b
-
-predicate sat_with_pval (pval : pval) (cnf : cnf) =
-  forall rho:valuation. compatible pval rho -> sat_with rho cnf
-
-predicate complete (pval : pval) =
-  forall v. 0 <= v < length pval -> assigned pval v
-
-(******************************************************************************)
-(* Partial evaluation of CNFs                                                 *)
-(******************************************************************************)
-
-type cnf_status =                                       (* DO NOT CHANGE *)
-  | Sat
-  | Conflict clause
-  | Unit_clause lit
-  | Other
-
-type clause_status =                                    (* DO NOT CHANGE *)
-  | Satisfied
-  | Conflicting
-  | Unit lit
-  | Unresolved
-
-exception Conflict_found clause
-exception Unit_found lit
-
-let rec partial_eval_clause (pval : pval) (c : clause) : clause_status =
-  Unresolved (* Specify and implement this function *)
-
-let partial_eval_cnf (pval : pval) (cnf : cnf) : cnf_status =
-  Other (* Specify and implement this function *)
 
 (******************************************************************************)
 (* Helpful definitions and utility functions                                  *)
@@ -175,6 +131,140 @@ let clause_in_cnf (c : clause) (cnf : cnf) : bool
   done ;
   r
 
+(******************************************************************************)
+(* Partial valuations                                                         *)
+(******************************************************************************)
+
+type pval = array (option bool)                         (* DO NOT CHANGE *)
+
+predicate valid_pval (pval : pval) (cnf : cnf) =
+  length pval = cnf.nvars                               (* DO NOT CHANGE *)
+
+predicate pval_eq (pval pval' : pval) = array_eq pval pval'
+
+predicate assigned (pval : pval) (v : var) = pval[v] <> None
+
+predicate compatible (pval : pval) (rho : valuation) =
+  forall i:int, b:bool. 0 <= i < length pval ->
+  pval[i] = Some b -> rho[i] = b
+
+predicate sat_with_pval (pval : pval) (cnf : cnf) =
+  forall rho:valuation. compatible pval rho -> sat_with rho cnf
+
+predicate complete (pval : pval) =
+  forall v. 0 <= v < length pval -> assigned pval v
+
+(******************************************************************************)
+(* Partial evaluation of CNFs                                                 *)
+(******************************************************************************)
+
+type cnf_status =                                       (* DO NOT CHANGE *)
+  | Sat
+  | Conflict clause
+  | Unit_clause lit
+  | Other
+
+type clause_status =                                    (* DO NOT CHANGE *)
+  | Satisfied
+  | Conflicting
+  | Unit lit
+  | Unresolved
+
+exception Conflict_found clause
+exception Unit_found lit
+
+predicate lit_sat (pval : pval) (lit : lit) =
+  0 <= lit.var < pval.length /\
+  exists b. pval[lit.var] = Some b /\ lit.sign = b
+
+predicate lit_conflict (pval : pval) (lit : lit) =
+  0 <= lit.var < pval.length /\
+  exists b. pval[lit.var] = Some b /\ lit.sign <> b
+
+predicate lit_unresolved (pval : pval) (lit : lit) =
+  0 <= lit.var < pval.length /\
+  pval[lit.var] = None
+
+let rec function partial_eval_clause (pval : pval) (c : clause) : clause_status =
+requires { vars_in_range (pval.length) c }
+ensures { result = Satisfied <-> 
+          (exists lit. sign_in_clause (lit.var) c (lit.sign) 
+           /\ lit_sat pval lit) }
+ensures { result = Conflicting <->
+          (forall lit. sign_in_clause (lit.var) c (lit.sign) ->
+           lit_conflict pval lit) }
+ensures { forall lit. result = Unit lit <-> 
+          (sign_in_clause (lit.var) c (lit.sign) 
+           /\ lit_unresolved pval lit
+           /\ (forall lit'. lit' <> lit 
+               /\ sign_in_clause (lit'.var) c (lit'.sign) ->
+               lit_conflict pval lit'))}
+variant { c }
+  match c with
+  | Nil -> Conflicting 
+  | Cons x Nil -> (
+    match pval[x.var] with
+    | None -> Unit x
+    | Some b -> if bool_eq x.sign b then Satisfied else Conflicting
+    end)
+  | Cons x xs -> (
+    let rec_res = partial_eval_clause pval xs in
+    match pval[x.var] with
+    | None -> (
+      match rec_res with
+      | Satisfied -> Satisfied
+      | Conflicting -> Unit x
+      | Unit _ -> Unresolved
+      | Unresolved -> rec_res
+      end)
+    | Some b -> (
+        if bool_eq b x.sign then Satisfied else
+        match rec_res with
+        | Satisfied -> Satisfied
+        | Conflicting -> Conflicting
+        | Unit _ -> rec_res
+        | Unresolved -> rec_res
+        end)
+    end)
+  end
+
+let partial_eval_cnf (pval : pval) (cnf : cnf) : cnf_status =
+requires { forall i. 0 <= i < cnf.clauses.length -> 
+           vars_in_range pval.length cnf.clauses[i] }
+ensures { result = Sat <-> 
+          (forall i. 0 <= i < cnf.clauses.length -> 
+           partial_eval_clause pval cnf.clauses[i] = Satisfied) }
+ensures { forall clause. result = Conflict clause -> 
+          (exists i. 0 <= i < cnf.clauses.length 
+           /\ partial_eval_clause pval cnf.clauses[i] = Conflicting) }
+ensures { forall lit. result = Unit_clause lit -> 
+          (exists i. 0 <= i < cnf.clauses.length 
+           /\ partial_eval_clause pval cnf.clauses[i] = Unit lit) }
+  try ( 
+    let ref res = Sat in
+    let ref i = 0 in 
+    while i < cnf.clauses.length do  
+    invariant { 0 <= i <= cnf.clauses.length }
+    invariant { res = Sat <-> 
+                (forall j. 0 <= j < i -> 
+                 partial_eval_clause pval cnf.clauses[j] = Satisfied) }
+    invariant { res = Sat \/ res = Other }
+    variant { cnf.clauses.length - i }
+      let clause = cnf.clauses[i] in
+      match partial_eval_clause pval clause with
+      | Conflicting -> raise Conflict_found clause
+      | Unit l -> raise Unit_found l
+      | Unresolved -> res <- Other
+      | Satisfied -> ()
+      end ;
+      i <- i + 1;
+    done ;
+    res)
+  with
+  | Conflict_found clause -> Conflict clause
+  | Unit_found l -> Unit_clause l
+  end
+
 end (* SatDefs *)
 
 module ResolutionProof
@@ -199,10 +289,6 @@ module ResolutionProof
     | Assume clause 
     | Resolve certificate certificate var clause 
 
-  let rec function bool_eq (b1 : bool) (b2 : bool)
-    ensures { result <-> (b1 <-> b2) }
-    = (b1 && b2) || (not(b1) && not(b2)) 
-    
   let rec function lit_eq (lit1 : lit) (lit2 : lit)
     ensures { result <-> lit1.var = lit2.var /\ bool_eq lit1.sign lit2.sign }
     = lit1.var = lit2.var && bool_eq lit1.sign lit2.sign
