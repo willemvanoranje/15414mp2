@@ -14,119 +14,400 @@
  <goal name="cnf&#39;vc" expl="VC for cnf" proved="true">
  <proof prover="2"><result status="valid" time="0.02" steps="57985"/></proof>
  </goal>
+ <goal name="bool_eq&#39;vc" expl="VC for bool_eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.04" steps="50481"/></proof>
+ </goal>
  <goal name="eval_clause&#39;vc" expl="VC for eval_clause" proved="true">
- <proof prover="2"><result status="valid" time="0.15" steps="455387"/></proof>
+ <proof prover="2"><result status="valid" time="0.15" steps="494062"/></proof>
  </goal>
  <goal name="eval_cnf&#39;vc" expl="VC for eval_cnf" proved="true">
- <proof prover="2"><result status="valid" time="0.10" steps="320350"/></proof>
+ <proof prover="2"><result status="valid" time="0.10" steps="321026"/></proof>
  </goal>
  <goal name="var_in_clause&#39;vc" expl="VC for var_in_clause" proved="true">
- <proof prover="2"><result status="valid" time="0.05" steps="184929"/></proof>
+ <proof prover="2"><result status="valid" time="0.05" steps="220532"/></proof>
  </goal>
  <goal name="lit_in_clause&#39;vc" expl="VC for lit_in_clause" proved="true">
- <proof prover="2"><result status="valid" time="0.05" steps="185623"/></proof>
+ <proof prover="2"><result status="valid" time="0.05" steps="174315"/></proof>
  </goal>
  <goal name="check_clause_contained&#39;vc" expl="VC for check_clause_contained" proved="true">
- <proof prover="1"><result status="valid" time="0.09" steps="25737"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="3030693"/></proof>
+ <proof prover="1"><result status="valid" time="0.09" steps="23754"/></proof>
  </goal>
  <goal name="check_equal_clause&#39;vc" expl="VC for check_equal_clause" proved="true">
- <proof prover="2"><result status="valid" time="0.03" steps="72160"/></proof>
+ <proof prover="2"><result status="valid" time="0.03" steps="60371"/></proof>
  </goal>
  <goal name="clause_in_cnf&#39;vc" expl="VC for clause_in_cnf" proved="true">
- <proof prover="2"><result status="valid" time="0.04" steps="178949"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="167164"/></proof>
  </goal>
-</theory>
-<theory name="ResolutionProof" proved="true">
- <goal name="bool_eq&#39;vc" expl="VC for bool_eq" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="73027"/></proof>
- </goal>
- <goal name="lit_eq&#39;vc" expl="VC for lit_eq" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="5590"/></proof>
- </goal>
- <goal name="cnf_contains&#39;vc" expl="VC for cnf_contains" proved="true">
- <proof prover="2"><result status="valid" time="0.07" steps="276206"/></proof>
- </goal>
- <goal name="clause_mem&#39;vc" expl="VC for clause_mem" proved="true">
- <proof prover="1"><result status="valid" time="0.10" steps="28748"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="2867250"/></proof>
- </goal>
- <goal name="includes_all_except_forward&#39;vc" expl="VC for includes_all_except_forward" proved="true">
- <proof prover="0"><result status="valid" time="0.20" steps="1966"/></proof>
- <proof prover="1"><result status="timeout" time="1.00" steps="284897"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="2605666"/></proof>
- </goal>
- <goal name="includes_all_except_reverse&#39;vc" expl="VC for includes_all_except_reverse" proved="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.07" steps="625"/></proof>
- <proof prover="1"><result status="valid" time="0.26" steps="79554"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="2656120"/></proof>
- </goal>
- <goal name="includes_all_except&#39;vc" expl="VC for includes_all_except" proved="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.22" steps="59125"/></proof>
- <proof prover="2"><result status="valid" time="0.53" steps="2201417"/></proof>
- </goal>
- <goal name="valid_resolution_fn&#39;vc" expl="VC for valid_resolution_fn" proved="true">
- <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
- <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="603017"/></proof>
- <proof prover="2"><result status="valid" time="0.09" steps="387591"/></proof>
- <transf name="split_vc" >
-  <goal name="valid_resolution_fn&#39;vc.0" expl="postcondition">
-  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
-  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="582836"/></proof>
-  <proof prover="2" obsolete="true"><result status="highfailure" time="0.43" steps="1552098"/></proof>
-  <transf name="split_vc" >
-   <goal name="valid_resolution_fn&#39;vc.0.0" expl="postcondition">
-   <proof prover="0" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00"/></proof>
-   <proof prover="1" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00" steps="2026317"/></proof>
-   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="highfailure" time="2.79" steps="7821164"/></proof>
+ <goal name="partial_eval_clause&#39;vc" expl="VC for partial_eval_clause" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="partial_eval_clause&#39;vc.0" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="163089"/></proof>
+  </goal>
+  <goal name="partial_eval_clause&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="90545"/></proof>
+  </goal>
+  <goal name="partial_eval_clause&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="93913"/></proof>
+  </goal>
+  <goal name="partial_eval_clause&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="185219"/></proof>
+  </goal>
+  <goal name="partial_eval_clause&#39;vc.4" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="partial_eval_clause&#39;vc.4.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="partial_eval_clause&#39;vc.4.0.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.03" steps="40796"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.4.0.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.04" steps="80881"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.4.0.2" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.12" steps="350864"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.4.0.3" expl="postcondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="partial_eval_clause&#39;vc.4.0.3.0" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.13" steps="364967"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.0.3.1" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="86815"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.0.3.2" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="43051"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.0.3.3" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.02" steps="42964"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.0.3.4" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.42" steps="3058"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="valid_resolution_fn&#39;vc.0.1" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.02" steps="6649"/></proof>
-   </goal>
-   <goal name="valid_resolution_fn&#39;vc.0.2" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.07" steps="267703"/></proof>
-   </goal>
-   <goal name="valid_resolution_fn&#39;vc.0.3" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="107258"/></proof>
-   </goal>
-   <goal name="valid_resolution_fn&#39;vc.0.4" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="101421"/></proof>
+   <goal name="partial_eval_clause&#39;vc.4.1" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="partial_eval_clause&#39;vc.4.1.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.03" steps="83047"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.4.1.1" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="98"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.4.1.2" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.03" steps="250"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.4.1.3" expl="postcondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="partial_eval_clause&#39;vc.4.1.3.0" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.02" steps="5532"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.1.3.1" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="131"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.1.3.2" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.13" steps="381734"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.1.3.3" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="166"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.4.1.3.4" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.05" steps="439"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="valid_resolution_fn&#39;vc.1" expl="postcondition">
-  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
-  <proof prover="1" obsolete="true"><result status="timeout" time="1.00" steps="590744"/></proof>
-  <proof prover="2" obsolete="true"><result status="highfailure" time="0.44" steps="1549623"/></proof>
-  <transf name="split_vc" >
-   <goal name="valid_resolution_fn&#39;vc.1.0" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.10" steps="336291"/></proof>
+  <goal name="partial_eval_clause&#39;vc.5" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="partial_eval_clause&#39;vc.5.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="partial_eval_clause&#39;vc.5.0.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.03" steps="82331"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.5.0.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.03" steps="81835"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.5.0.2" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.12" steps="348367"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.5.0.3" expl="postcondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="partial_eval_clause&#39;vc.5.0.3.0" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="45568"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.5.0.3.1" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="87905"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.5.0.3.2" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.02" steps="43289"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.5.0.3.3" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.02" steps="43184"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.5.0.3.4" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="partial_eval_clause&#39;vc.5.0.3.4.0" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.03" steps="45803"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.5.0.3.4.1" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.02" steps="45834"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.5.0.3.4.2" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.15" steps="392325"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.5.0.3.4.3" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.03" steps="91410"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.5.0.3.4.4" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.02" steps="45936"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="valid_resolution_fn&#39;vc.1.1" expl="postcondition">
-   <proof prover="0" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00"/></proof>
-   <proof prover="1" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.00" steps="2420626"/></proof>
-   <proof prover="2" timelimit="10" memlimit="4000" obsolete="true"><result status="highfailure" time="2.90" steps="6903056"/></proof>
+   <goal name="partial_eval_clause&#39;vc.5.1" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="partial_eval_clause&#39;vc.5.1.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="5317"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.5.1.1" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="103"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.5.1.2" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.05" steps="384"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.5.1.3" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.20" steps="523304"/></proof>
+    </goal>
+   </transf>
    </goal>
-   <goal name="valid_resolution_fn&#39;vc.1.2" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.06" steps="245730"/></proof>
+  </transf>
+  </goal>
+  <goal name="partial_eval_clause&#39;vc.6" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="partial_eval_clause&#39;vc.6.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="partial_eval_clause&#39;vc.6.0.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.03" steps="88728"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.0.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.10" steps="304957"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.0.2" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.11" steps="342890"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.0.3" expl="postcondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="partial_eval_clause&#39;vc.6.0.3.0" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="97025"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.0.3.1" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.11" steps="336530"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.0.3.2" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.04" steps="94598"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.0.3.3" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="94421"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.0.3.4" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="partial_eval_clause&#39;vc.6.0.3.4.0" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="97305"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.0.3.4.1" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="100443"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.0.3.4.2" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.05" steps="99927"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.0.3.4.3" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.06" steps="121989"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.0.3.4.4" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="100347"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="valid_resolution_fn&#39;vc.1.3" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="111135"/></proof>
+   <goal name="partial_eval_clause&#39;vc.6.1" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="partial_eval_clause&#39;vc.6.1.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.04" steps="88470"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.1.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.10" steps="303017"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.1.2" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.12" steps="338881"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.1.3" expl="postcondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="partial_eval_clause&#39;vc.6.1.3.0" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.04" steps="96641"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.1.3.1" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.04" steps="114105"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.1.3.2" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="94338"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.1.3.3" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="94079"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.1.3.4" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="partial_eval_clause&#39;vc.6.1.3.4.0" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.03" steps="97042"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.1.3.4.1" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="100055"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.1.3.4.2" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="99555"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.1.3.4.3" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="91930"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.1.3.4.4" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="99997"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="valid_resolution_fn&#39;vc.1.4" expl="postcondition">
-   <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="105195"/></proof>
+   <goal name="partial_eval_clause&#39;vc.6.2" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="partial_eval_clause&#39;vc.6.2.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.03" steps="89120"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.2.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.10" steps="303681"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.2.2" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.11" steps="341025"/></proof>
+    </goal>
+    <goal name="partial_eval_clause&#39;vc.6.2.3" expl="postcondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="partial_eval_clause&#39;vc.6.2.3.0" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.04" steps="97558"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.2.3.1" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.12" steps="332634"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.2.3.2" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.04" steps="95125"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.2.3.3" expl="postcondition" proved="true">
+     <proof prover="2"><result status="valid" time="0.04" steps="94948"/></proof>
+     </goal>
+     <goal name="partial_eval_clause&#39;vc.6.2.3.4" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="partial_eval_clause&#39;vc.6.2.3.4.0" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="97838"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.2.3.4.1" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="100984"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.2.3.4.2" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.04" steps="100385"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.2.3.4.3" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.12" steps="408809"/></proof>
+      </goal>
+      <goal name="partial_eval_clause&#39;vc.6.2.3.4.4" expl="postcondition" proved="true">
+      <proof prover="2"><result status="valid" time="0.03" steps="100888"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="partial_eval_cnf&#39;vc" expl="VC for partial_eval_cnf" proved="true">
+ <proof prover="2"><result status="valid" time="0.33" steps="758123"/></proof>
+ </goal>
+</theory>
+<theory name="ResolutionProof" proved="true">
+ <goal name="lit_eq&#39;vc" expl="VC for lit_eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="6583"/></proof>
+ </goal>
+ <goal name="cnf_contains&#39;vc" expl="VC for cnf_contains" proved="true">
+ <proof prover="2"><result status="valid" time="0.07" steps="291463"/></proof>
+ </goal>
+ <goal name="clause_mem&#39;vc" expl="VC for clause_mem" proved="true">
+ <proof prover="1"><result status="valid" time="0.10" steps="31111"/></proof>
+ </goal>
+ <goal name="includes_all_except_forward&#39;vc" expl="VC for includes_all_except_forward" proved="true">
+ <proof prover="0"><result status="valid" time="0.34" steps="2012"/></proof>
+ </goal>
+ <goal name="includes_all_except_reverse&#39;vc" expl="VC for includes_all_except_reverse" proved="true">
+ <proof prover="1"><result status="valid" time="0.44" steps="81917"/></proof>
+ </goal>
+ <goal name="includes_all_except&#39;vc" expl="VC for includes_all_except" proved="true">
+ <proof prover="2"><result status="valid" time="0.25" steps="578680"/></proof>
+ </goal>
+ <goal name="valid_resolution_fn&#39;vc" expl="VC for valid_resolution_fn" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="valid_resolution_fn&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="valid_resolution_fn&#39;vc.0.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.13" steps="302103"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.02" steps="7642"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.2" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.07" steps="258794"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.3" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="124569"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.0.4" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="117178"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="valid_resolution_fn&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="valid_resolution_fn&#39;vc.1.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.10" steps="352397"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.12" steps="282372"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.2" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.06" steps="262023"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.3" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="128954"/></proof>
+   </goal>
+   <goal name="valid_resolution_fn&#39;vc.1.4" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.03" steps="121460"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="valid_resolution_chain_fn&#39;vc" expl="VC for valid_resolution_chain_fn" proved="true">
- <proof prover="1"><result status="valid" time="0.13" steps="43776"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="3302754"/></proof>
+ <proof prover="1"><result status="valid" time="0.13" steps="46193"/></proof>
  </goal>
  <goal name="check_refutation&#39;vc" expl="VC for check_refutation" proved="true">
- <proof prover="1"><result status="valid" time="0.07" steps="24287"/></proof>
- <proof prover="2"><result status="timeout" time="1.00" steps="3598241"/></proof>
+ <proof prover="1"><result status="valid" time="0.07" steps="26605"/></proof>
  </goal>
 </theory>
 </file>

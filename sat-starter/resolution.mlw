@@ -193,7 +193,7 @@ ensures { result = Satisfied <->
 ensures { result = Conflicting <->
           (forall lit. sign_in_clause (lit.var) c (lit.sign) ->
            lit_conflict pval lit) }
-ensures { forall lit. result = Unit lit <-> 
+ensures { forall lit. result = Unit lit -> 
           (sign_in_clause (lit.var) c (lit.sign) 
            /\ lit_unresolved pval lit
            /\ (forall lit'. lit' <> lit 
@@ -317,7 +317,7 @@ module ResolutionProof
     contains
   
   predicate valid_resolution (clause1 : clause) (clause2: clause) (v : var) (res : clause) 
-    axiom val_res_axiom: forall clause1,clause2,res : clause. forall cnf : cnf. forall v: var.
+    axiom val_res_axiom: forall clause1,clause2,res : clause. forall v: var.
                          (valid_resolution clause1 clause2 v res) <->
                         ((mem ({var=v; sign=true}) clause1 /\ mem ({var=v; sign=false}) clause2)
                           \/ (mem ({var=v; sign=false}) clause2 /\ mem ({var=v; sign=true}) clause2))
@@ -352,7 +352,7 @@ module ResolutionProof
   predicate valid_refutation (p : certificate) (cnf : cnf)  = (* Specify the set of valid refutations *)
     match p with
     | Assume Nil -> cnf_contains Nil cnf
-    | Assume (Cons x xs) -> false
+    | Assume (Cons _ _) -> false
     | Resolve _ _ _ res -> clause_eq res Nil /\ valid_resolution_chain p cnf
     end
 
